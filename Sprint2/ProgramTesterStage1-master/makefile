@@ -13,4 +13,4 @@ tester.o: ProgramTester.cpp
 	$(CC) $(CFLAGS) ProgramTester.cpp
 
 clean:
-	rm -rf *o ProgramTester
+	rm *.o ProgramTester
