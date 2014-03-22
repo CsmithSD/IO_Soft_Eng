@@ -24,7 +24,7 @@ const int MAX_TEST = 100;
 bool run_test_case( std::string test_file, std::string exec,
         std::string &log_file,const std::string &rootDir );
 void Compil( std::string progName );
-std::string FinalLogWrite( std::string log_file, int numPassed, int numTest );
+std::string FinalLogWrite( std::string &log_file, int numPassed, int numTest );
 void LogWrite( std::ofstream & fout, std::string testNumber, std::string result );
 void DirCrawl( std::string rootDir , std::string &logFile , std::string exec ,
         int &passed , int &tested, const std::string &masterRootDir);
@@ -32,18 +32,18 @@ void generateTst(std::string choice);
 void prompt();
 void sysProg(std::string test);
 void cppDirCrawl( std::string curDir, std::vector< std::string > &cppFiles );
-void nameLogFiles( std::vector< std::string > &logNames, time_t &timer,
+void nameLogFiles( std::vector< std::string > &logNames, time_t timer,
                    std::vector< std::string > &studentNames);
 void nameExec( std::string &exec );
 bool critTest(std::string curDir, std::string logFile, std::string exec, 
-              std::string pass_fail, std::string studentName);
+              std::string pass_fail);
 
 bool runCritTst(std::string critTst , std::string exec, std::string logFile);
 bool check_if_cpp_file(char name[]);
 bool check_if_tests_dir(char name[]);
 void cleanUpGeneratedTests();
 void writeSummaryLog( std::string student_name, std::string result,
-                      const std::string &root_directory );
+                      time_t timer );
 void critLogWrite( std::string log_file_name, bool passed_crit_tests, 
                    std::string test_file_name );
 
@@ -102,18 +102,18 @@ int main() /*int argc , char** argv  )*/
     {
         nameExec(exec);
         if( critTest(std::string(cCurrentPath) + "/tests/", logNames[i],
-                    exec, critAccepted, studentNames[i]) )
+                    exec, critAccepted ))
         {
             //find and run test cases
             DirCrawl( std::string(cCurrentPath) + "/tests/", logNames[i], 
                       exec , passed , tested, std::string(cCurrentPath) );
 
             //write final output to logfile
-           percent = FinalLogWrite(logNames[i],passed,tested);
-            writeSummaryLog(studentNames[i], percent);
+            percent = FinalLogWrite(logNames[i], passed, tested);
+            writeSummaryLog(studentNames[i], percent,timer);
         }
         else
-            writeSummaryLog(studentNames[i], "FAILED");
+            writeSummaryLog(studentNames[i], "FAILED",timer);
     }
     //remove junk files
     system("rm a.out");
@@ -471,8 +471,8 @@ bool critTest(std::string curDir, std::string logFile, std::string exec,
             }
         }
         else if( (int)namelist[i] -> d_type == 4 )
-            critTest(curDir + std::string(namelist[i] -> d_name) + '/', logFile, exec,
-                                                                      pass_fail);
+            critResult = critTest(curDir + std::string(namelist[i] -> d_name)
+                                  + '/', logFile, exec, pass_fail);
     }
     for( i = 0; i < n; i++ )
         delete []namelist[i];
@@ -761,13 +761,13 @@ void critLogWrite( std::string log_file_name, bool passed_crit_tests,
  ****************************************************************************/
 
 void writeSummaryLog( std::string student_name, std::string result,
-                      const std::string &root_directory )
+                      time_t timer )
 {
     std::ofstream fout;
     std::string summary_file_name;
 
-    summary_file_name = root_directory + "class_summary.log";
-    fout.open( summary_file_name.c_str(), std::ios out| std::ios app );
+    summary_file_name = "class_summary_" + std::string(ctime(&timer)) + ".log";
+    fout.open( summary_file_name.c_str(), std::ios::app | std::ios::out );
 
     fout << std::setw( 50 ) << student_name << std::setw( 20 ) << result <<
             std::endl;
