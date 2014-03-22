@@ -65,7 +65,6 @@ int main() /*int argc , char** argv  )*/
     time_t timer;
     std::string filename;
     std::string percent;
-    bool foundFlag = false;
     std::string cppFile;
     std::vector< std::string > cppFiles;
     std::vector< std::string > studentNames;
@@ -152,7 +151,7 @@ bool run_test_case( std::string test_file, std::string exec,
     std::ofstream fout;
     int i=0;
     int result;
-    int found;
+    unsigned int found;
     fout.open(log_file, std::ios::app | std::ios::out);
     found = test_file.find("Program_Tester_Generated_test");
 
@@ -383,7 +382,7 @@ void cppDirCrawl( std::string curDir, std::vector< std::string > &cppFiles )
 bool check_if_cpp_file(char name[])
 {
     std::string tmp = std::string(name);
-    int found;
+    unsigned int found;
 
     found = tmp.find(".cpp");
 
@@ -395,7 +394,7 @@ bool check_if_cpp_file(char name[])
 bool check_if_tests_dir(char name[])
 {
     std::string tmp = std::string(name);
-    int found;
+    unsigned int found;
 
     found = tmp.find("tests");
 
@@ -702,7 +701,7 @@ void critLogWrite( std::string log_file_name, bool passed_crit_tests,
                    std::string test_file_name )
 {
     std::ofstream fout;
-    int pos;
+    unsigned int pos;
     std::string temp_test_file_name = test_file_name;
 
     //parse test file name
