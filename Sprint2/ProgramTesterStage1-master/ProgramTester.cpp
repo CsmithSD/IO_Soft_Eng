@@ -1,4 +1,5 @@
 #include <fstream>
+#include <sstream>
 #include <string>
 #include <dirent.h>
 #include <iostream>
@@ -23,6 +24,9 @@ void FinalLogWrite( std::ofstream & fout, int numPassed, int numTest );
 void LogWrite( std::ofstream & fout, std::string testNumber, std::string result );
 void DirCrawl( std::string rootDir , std::ofstream &logFile , std::string exec ,
         int &passed , int &tested );
+void generateTst(std::string choice);
+void prompt();
+void sysProg(std::string test);
 void cppDirCrawl( std::string curDir, std::vector< std::string > &cppFiles );
 void nameLogFiles( std::vector< std::string > &logNames );
 void nameExec( std::string &exec );
@@ -444,3 +448,168 @@ bool runCritTst( std::string critTst, std::string exec, std::string logFile)
 {
 
 }
+
+/******************************************************************************//**
+ * @author Jarod Hogan
+ *
+ * @Description
+ * A method to generate a random list of integers or floats as decided by the user.
+ * When the list has been generated it is run against a program called 'golden.cpp'.
+ * This program is assumed to be in the current directory. It is run by calling 
+ * sysProg.
+ * 
+ * @param[in] max - Length of list
+ * @param[in] choice - either int or float. This is checked when method is called.
+ * 
+ * @returns none
+ *********************************************************************************/
+void generateTst(std::string choice)
+{
+  std::ofstream fout;
+  int randNum,i,j;
+  double randNum2;
+  std::string filePath = "./tests/";
+  std::string name = "test";
+  std::string ext = ".tst";
+  std::string num;
+  std::string filename;
+  std::ostringstream convert;
+  int max1, max2, temp;
+
+  srand(time(NULL));  
+  max1 = rand() % MAX_TEST + 1;
+
+  for(j = 0; j < max1; j++)
+  {
+    temp = j;
+    convert << temp;
+    num = convert.str();
+    convert.str("");
+    filename = filePath + name + num + ext;
+    fout.open(filename.c_str());
+    if(!fout)
+    {
+      std::cout << "Could not open " << filename << std::endl;
+    }
+    if(choice == "int")
+    {
+        max2 = rand() % MAX_LIST + 1;
+
+        for(i= 0; i < max2; i++)
+        {
+          //generate rand number
+          randNum = rand();
+
+          fout << randNum << std::endl;
+   
+        }
+    }//end if
+    else
+    {
+      //initialize random seed
+      srand(time(NULL));  
+      max2 = rand() % MAX_LIST + 1;
+
+      for(i= 0; i < max2; i++)
+      {
+        //generate rand number
+        randNum = rand();
+        randNum2 = rand();
+ 
+        while(randNum2 > 0)
+        {
+          randNum2 /= 10;
+        }
+        randNum2 = double(randNum) + randNum2;
+    
+        fout << randNum2 << std::endl;
+      }//end For
+    }//end Else
+
+    fout.close();
+  
+ 
+    sysProg(filename);
+  }//end for loop
+}
+
+/******************************************************************************//**
+ * @author Jarod Hogan
+ *
+ * @Description
+ * This function compiles and runs the golden.cpp (which is specified by the user). 
+ * The output is redirected to the answer (testfilename.ans) file for the 
+ * cooresponding test file.
+ * 
+ * @param[in] test - the name of the test file generated above
+ * 
+ * @returns none
+ *********************************************************************************/
+void sysProg(std::string test)
+{
+  std::string compile = "g++ -o test golden.cpp ";
+  std::string run = "./test";
+  std::string answer = test.substr(8, test.size());
+  answer = answer.substr(0, answer.size()-3) + "ans";
+
+  system(compile.c_str());
+  run = run + " < " + test + " > " + answer;
+
+  system(run.c_str());
+ 
+}
+
+
+/******************************************************************************//**
+ * @author Jarod Hogan
+ *
+ * @Description
+ * This function prompts the user if she wants to generate her own test cases and
+ * run them against the golden cpp.
+ * 
+ * @returns none
+ *********************************************************************************/
+void prompt()
+{
+  char ans;
+  std::string choice;
+  bool flag = false;
+
+
+  do
+  {
+    std::cout << "Would you like to generate test cases?(Y(y)/N(n)): ";
+    std::cin >> ans;
+
+    ans = tolower(ans);
+    switch(ans)
+    { 
+      case 'y':
+        std::cout << "Enter choice: ";
+        std::cin >> choice;
+        if((choice != "int") && (choice != "float"))
+        { 
+          std::cout << "Bad Choice" << std::endl;
+          break;
+        }
+        
+        generateTst(choice);
+        flag = true;
+        break;
+      case 'n':
+        flag =true;
+        break;
+      default:
+        std::cout << "Your choice " << ans << " is not a valid option." << std::endl;
+        std::cout << "Valid options are Y,y,N,n only!" << std::endl;
+    }
+  }while(flag == false);
+  
+}
+
+
+
+
+
+
+
