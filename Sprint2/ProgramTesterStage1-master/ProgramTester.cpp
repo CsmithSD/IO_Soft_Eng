@@ -10,29 +10,34 @@
 #include <unistd.h>
 #include <iomanip>
 #include <time.h>
+#include <vector>
 
 
 /**********************************************************************************
  *                               FUNCTION PROTOTYPES
  *********************************************************************************/
 bool run_test_case( std::string test_file, std::string exec,
-                    std::ofstream &log_file );
-void Compil(  std::string root, std::string progName );
+        std::ofstream &log_file );
+void Compil( std::string progName );
 void FinalLogWrite( std::ofstream & fout, int numPassed, int numTest );
 void LogWrite( std::ofstream & fout, std::string testNumber, std::string result );
 void DirCrawl( std::string rootDir , std::ofstream &logFile , std::string exec ,
-               int &passed , int &tested );
-
+        int &passed , int &tested );
+void cppDirCrawl( std::string curDir, std::vector< std::string > &cppFiles );
+void nameLogFiles( std::vector< std::string > &logNames );
+void nameExec( std::string &exec );
+void critTest(std::string curDir, std::string logFile, std::string exec std::string pass_fail );
+bool runCritTst( string(namelist[i]->d_name), exec, logFile);
 /******************************************************************************//**
  *
  *
  *********************************************************************************/
-int main( int argc , char** argv )
+int main() /*int argc , char** argv  )*/
 {
     int passed = 0;
     int tested = 0;
     std::ofstream logfile;
-    std::string logName;
+    std::vector< std::string > logNames;
     std::string root;
     std::string exec;
     char cCurrentPath[FILENAME_MAX];
@@ -42,67 +47,23 @@ int main( int argc , char** argv )
     std::string filename;
     bool foundFlag = false;
     std::string cppFile;
-
-    //check that an argument was passed
-    if ( argc < 2 )
-    {
-        std::cout << "No argument was passed to test.\nExiting Program"
-                     << std::endl;
-        return 0;
-    }
+    std::vector< std::string > cppFiles;
+    int i;
 
     //get current working directory, place in cCurrentPath
     getcwd(cCurrentPath , sizeof(cCurrentPath) );
-    //get root directory in string
-    
-    root = argv[1];
 
-    //Find the ".cpp"
-    dir = opendir( root.c_str() );
-    while( ( file = readdir(dir) ) != NULL && !foundFlag )
-      {
-        //Get the file name
-        filename = file -> d_name;
-        //skip over "." and ".."
-        if( filename != "." && filename != ".." )
-          {
-        if(filename.find( ".cpp" ) != std::string::npos )
-          {
-            cppFile = filename;
-            foundFlag = true;
-          }
-          }
-      }
+    //finds all the cpp files below current directory
+    cppDirCrawl(string(cCurrentPath), cppFiles)
 
+        //creates a copy of the vector of strings holding the cpp files
+    logNames = std::vector(cppFiles);
 
-    if( !foundFlag )
-      {
-        std::cout << "Could not find a cpp file." << std::endl;
-	std::cout << "Ending Program" << std::endl;
-        return 0;
-      }
-    
-    //Get the name for the log file
-    logName = root + '/' + cppFile;
-    //Remove the extension from the file name, keep the '.'
-    while(logName[logName.length() - 1] != '.')
-        logName.resize(logName.length() - 1);
-    //add the log to the file name
-    logName += "log";
-
-    //open log file and append to it
-    logfile.open(logName.c_str(), std::ofstream::app);
-
-    //Check that logfile was opened
-    if ( !logfile )
-    {
-        std::cout << "Log file could not be opened\nExiting Program"
-                     << std::endl;
-        return 0;
-    }
+    //Modifies strings to use student directory name in log file name.
+    nameLogFiles(logNames);
 
     //getting the current time
-    time( &timer);
+    time( &timer );
     //Just need to print it out to the log file first thing.
     logfile << "--------------------" << std::endl;
     logfile << ctime( &timer ) << std::endl;
@@ -110,23 +71,24 @@ int main( int argc , char** argv )
     //compile the code
     //Passing the root directory of this program
     //and the .cpp or .C file to be tested
-    Compil(root, cppFile);
+    for( cppFile : cppFiles )
+        Compil(cppFile);
 
-    
+
     //get directory to executable in string
-    exec = cCurrentPath;
-    exec += "/a.out";
+    i = 0;
+    for( exec : cppFiles )
+    {
+        nameExec(exec)
+            //find and run test cases
+            DirCrawl( string(cCurrentPath) + "/tests/" , logNames[i] , exec , passed , tested );
 
-    //find and run test cases
-    DirCrawl( root + '/' , logfile , exec , passed , tested );
-
-    //write final output to logfile
-    FinalLogWrite(logfile,passed,tested);
-
-    //close logfile
-    logfile << "--------------------" << std::endl;
-    logfile.close();
-
+        //write final output to logfile
+        FinalLogWrite(logNames[i],passed,tested);
+        //close logfile
+        logfile << "--------------------" << std::endl;
+        logfile.close();
+    }
     //remove junk files
     system("rm a.out");
     system("rm nul");
@@ -155,7 +117,7 @@ int main( int argc , char** argv )
  *
  *********************************************************************************/
 bool run_test_case( std::string test_file, std::string exec,
-                    std::ofstream &log_file )
+        std::ofstream &log_file )
 {
     std::string out_file = test_file;
     std::string ans_file = test_file;
@@ -217,28 +179,21 @@ bool run_test_case( std::string test_file, std::string exec,
  * @Description
  * A simple funciton that compiles the program, given by progname
  * in the form of a .cpp file, with g++ to default compiled program
- * a.out. The source code should be in the directory provided
- * by root.
+ * a.out.
  * 
- * @parm[in] root - directory to find the program.
  * @pram[in] progName - The name of the .cpp file for the source code.
  *                      (should include .cpp at the end.)
  *
  * @returns none
  *********************************************************************************/
-void Compil(  std::string root, std::string progName )
+void Compil( std::string progName )
 {
-  //Create the argument to send to g++
-  std::string progPath = "";
-  progPath += root;
-  progPath += "/";
-  progPath += progName;
-  //creat the system command and execute it.
-  std::string command;
-  command = "g++ " + progPath;
-  system( command.c_str() );
- 
-  return;
+    //creat the system command and execute it.
+    std::string command;
+    command = "g++ " + progName;
+    system( command.c_str() );
+
+    return;
 }
 
 /******************************************************************************//**
@@ -256,22 +211,22 @@ void Compil(  std::string root, std::string progName )
  *********************************************************************************/
 void FinalLogWrite( std::ofstream & fout, int numPassed, int numTest )
 {
-  //Calculate the number of tests failed.
-  int numFailed;
-  numFailed = numTest - numPassed;
-  //Calculate the percent passed.
-  float perPassed;
-  perPassed = (float) numPassed/numTest;
-  perPassed =  (int)(perPassed * 100);
-  //Calculate the percent failed.
-  float perFailed;
-  perFailed = (float) numFailed/numTest;
-  perFailed = (int)(perFailed * 100);
- 
-  //Write to stream.
-  fout << "Percent of tests Passed: " << perPassed <<  "%" << std::endl;
-  fout << "Percent of tests failed: " << perFailed << "%" << std::endl;
-  return;
+    //Calculate the number of tests failed.
+    int numFailed;
+    numFailed = numTest - numPassed;
+    //Calculate the percent passed.
+    float perPassed;
+    perPassed = (float) numPassed/numTest;
+    perPassed =  (int)(perPassed * 100);
+    //Calculate the percent failed.
+    float perFailed;
+    perFailed = (float) numFailed/numTest;
+    perFailed = (int)(perFailed * 100);
+
+    //Write to stream.
+    fout << "Percent of tests Passed: " << perPassed <<  "%" << std::endl;
+    fout << "Percent of tests failed: " << perFailed << "%" << std::endl;
+    return;
 }
 
 /******************************************************************************//**
@@ -289,9 +244,9 @@ void FinalLogWrite( std::ofstream & fout, int numPassed, int numTest )
  *********************************************************************************/
 void LogWrite( std::ofstream & fout, std::string testNumber, std::string result )
 {
-  fout << testNumber << ": " << result.c_str() << std::endl;
-  return;
-  
+    fout << testNumber << ": " << result.c_str() << std::endl;
+    return;
+
 }
 
 /******************************************************************************//**
@@ -309,63 +264,183 @@ void LogWrite( std::ofstream & fout, std::string testNumber, std::string result 
  *********************************************************************************/
 void DirCrawl( std::string rootDir , std::ofstream &logFile , std::string exec , int &passed , int &tested )
 {
-	DIR* dir = opendir( rootDir.c_str() );	// Open the directory
-	struct dirent* file;	// File entry structure from dirent.h
-	std::string filename;	//used in finding if a file has the extention .tst
+    DIR* dir = opendir( rootDir.c_str() );	// Open the directory
+    struct dirent* file;	// File entry structure from dirent.h
+    std::string filename;	//used in finding if a file has the extention .tst
 
-	// Read each file one at a time
-	// Readdir returns next file in the directory, returns null if no other files exist
-	while( ( file = readdir(dir)) != NULL )
-	{
-		//place file name into string filename for easier checking
-		filename = file->d_name;
+    // Read each file one at a time
+    // Readdir returns next file in the directory, returns null if no other files exist
+    while( ( file = readdir(dir)) != NULL )
+    {
+        //place file name into string filename for easier checking
+        filename = file->d_name;
 
-		// skip over the directories "." and ".."
-		if ( filename != "." && filename != ".." )
-		{
-			// checks if the file is a subdirectory, 4 is the integer idetifyer
-			// for the dirent struct on Lixux systems
-			if ( (int)file->d_type == 4 )
-			{
-				//moves into the sub-directory
+        // skip over the directories "." and ".."
+        if ( filename != "." && filename != ".." )
+        {
+            // checks if the file is a subdirectory, 4 is the integer idetifyer
+            // for the dirent struct on Lixux systems
+            if ( (int)file->d_type == 4 )
+            {
+                //moves into the sub-directory
                 DirCrawl( rootDir + filename + "/" , logFile , exec , passed , tested );
-			}
-			else
-			{
-				// checks if the file has a .tst in it. string find returns
-				// string::npos if the substring cannot be found
-				if ( filename.find( ".tst") != std::string::npos )
-				{
-					// pass the file onto the grader 
+            }
+            else if(filename.find("_crit.tst") == std::string::npos)
+            {
+                // checks if the file has a .tst in it. string find returns
+                // string::npos if the substring cannot be found
+                if ( filename.find( ".tst") != std::string::npos )
+                {
+                    // pass the file onto the grader 
                     if (run_test_case( rootDir + '/' + filename , exec , logFile ) )
-					{
-						passed += 1;
-					}
-					tested += 1;
+                    {
+                        passed += 1;
+                    }
+                    tested += 1;
 
-				}
-			}
-		}
-	}
+                }
+            }
+        }
+    }
 
-	closedir(dir);
+    closedir(dir);
 
-	return;
+    return;
 }
 
 
 
+void cppDirCrawl( std::string curDir, std::vector< std::string > &cppFiles )
+{
+    struct dirent **namelist; //structure in dirent.h stores the file name 
+    //and the file id number
+    int n;
+    std::string tmp;
+    int i;
+    //scans the current directory for all 
+    //types stores how many are found in n and the names in namelist
+    n = scandir(file.c_str(), &namelist, 0, alphasort);
+    if(n == -1)
+        return;
+    //starts at the second position since 
+    //the first two files found are the . and .. directories
+    for(i=2; i<n; i++)
+    {
+        //checks if the file found is a .cpp file
+        if(check_if_cpp_file( namelist[i] -> d_name ))
+        {
+            cppFiles.pushback( string( namelist[i] -> d_name ) )
+        }
+        //Checks if the current spot is the tests directory and skips it
+        else if( check_if_tests_dir( namelist[i] -> d_name ) )
+        {
+            continue;
+        }
+        else
+        {
+            tmp = string(namelist[i] -> d_name);
+            cppDirCrawl(curDir + "/" + tmp, cppFiles);
+        }
 
+    }
+    for( i = 0; i < n; i++)
+        delete []namelist[i];
+    delete []namelist;
+}
 
+bool check_if_cpp_file(char name[])
+{
+    std::string tmp = string(name);
+    int found;
 
+    found = tmp.find(".cpp");
 
+    if(found == std::string::npos)
+        return false;
+    return true;
+}
 
+bool check_if_tests_dir(char name[])
+{
+    std::string tmp = string(name);
+    int found;
 
+    found = tmp.find("tests");
 
+    if(found == std::string::npos)
+        return false;
+    return true;
+}
 
+nameLogFiles( std::vector< std::string > &logNames )
+{
+    string tmp;
+    int i;
+    //iteraties through the vector creating strings for all log files.
+    for(logName : logNames)
+    {
+        //iterates through a string removing everything after the last occurence of '/'
+        //and stops when it is found
+        for( i = logName.length - 1; logName[i] != '/'; i--)
+            logName.pop_back();
 
+        //moves the access pointer one spot to the last occurrence of '/'
+        i--;
+        //stores the student name in tmp up to the second to last '/'
+        while(logName[i] != '/')
+        {
+            tmp += logName[i];
+            i--;
+        }
+        //appends a .log to tmp and appends the file name to string
+        tmp+=".log";
+        logName+=tmp;
+        //sets tmp as an empty string for next string in vector that needs to be modified
+        tmp = "":
+    }
+}
 
+void nameExec( std::string &exec )
+{
+    int i;
+    for( i = exec.length-1;exec[i]!= '/'; i--)
+        exec.pop_back();
+    exec+="./a.out"
+}
 
+void critTest(std::string curDir, std::string logFile, std::string exec std::string pass_fail )
+{
+    struct dirent **namelist; //structure in dirent.h stores the file name 
+    //and the file id number
+    int n;
+    std::string tmp;
+    int i;
+    //scans the current directory for all 
+    //types stores how many are found in n and the names in namelist
+    n = scandir(curDir.c_str(), &namelist, 0, alphasort);
+    if(n == -1)
+        return;
+    //starts at the second position since 
+    //the first two files found are the . and .. directories
+    for(i = 2; i<n && pass_fail != "FAILED"; i++)
+    {
+        if(string(namelist[i] -> d_name).find("_crit.tst") != std::string::npos)
+        {
+            if(runCritTest( std::string(nameList[i] -> d_name), exec, logFile)
+                    pass_fail = "FAILED"
 
+        }
+                    //Goes into next directory to search for more *_crit.tst files
+        else if( (int)namelist[i] -> d_type == 4 )
+                    critTest(curDir + string(namelist[i] -> d_name) + '/', logFile, exec, pass_fail);
 
+        }
+        for( i = 0; i < n; i++ )
+            delete []namelist[i];
+        delete []namelist;
+}
 
+bool runCritTst( std::string critTst, std::string exec, std::string logFile)
+{
+
+}
