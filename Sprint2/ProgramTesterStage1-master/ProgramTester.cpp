@@ -12,6 +12,11 @@
 #include <iomanip>
 #include <time.h>
 #include <vector>
+#include <algorithm>
+
+
+const int MAX_LIST = 200;
+const int MAX_TEST = 100;
 
 /**********************************************************************************
  *                               FUNCTION PROTOTYPES
@@ -21,19 +26,19 @@ bool run_test_case( std::string test_file, std::string exec,
 void Compil( std::string progName );
 std::string FinalLogWrite( std::string log_file, int numPassed, int numTest );
 void LogWrite( std::ofstream & fout, std::string testNumber, std::string result );
-void DirCrawl( std::string rootDir , std::ofstream &logFile , std::string exec ,
+void DirCrawl( std::string rootDir , std::string &logFile , std::string exec ,
         int &passed , int &tested, const std::string &masterRootDir);
 void generateTst(std::string choice);
 void prompt();
 void sysProg(std::string test);
 void cppDirCrawl( std::string curDir, std::vector< std::string > &cppFiles );
-void nameLogFiles( std::vector< std::string > &logNames, time_t &timer);
+void nameLogFiles( std::vector< std::string > &logNames, time_t &timer,
+                   std::vector< std::string > &studentNames);
 void nameExec( std::string &exec );
 bool critTest(std::string curDir, std::string logFile, std::string exec, 
               std::string pass_fail, std::string studentName);
 
-bool runCritTst( string(namelist[i]->d_name), std::string exec, std::string logFile,
-                 std::string studentName);
+bool runCritTst(std::string critTst , std::string exec, std::string logFile);
 bool check_if_cpp_file(char name[]);
 bool check_if_tests_dir(char name[]);
 
@@ -53,8 +58,6 @@ int main() /*int argc , char** argv  )*/
     std::string critAccepted = "PASSED";
     char cCurrentPath[FILENAME_MAX];
     time_t timer;
-    DIR* dir;
-    struct dirent* file;
     std::string filename;
     std::string percent;
     bool foundFlag = false;
@@ -70,10 +73,10 @@ int main() /*int argc , char** argv  )*/
     getcwd(cCurrentPath , sizeof(cCurrentPath) );
 
     //finds all the cpp files below current directory
-    cppDirCrawl(string(cCurrentPath), cppFiles)
+    cppDirCrawl(std::string(cCurrentPath), cppFiles);
 
     //creates a copy of the vector of strings holding the cpp files
-    logNames = std::vector(cppFiles);
+    logNames = std::vector< std::string >(cppFiles);
 
     //getting the current time
     time( &timer );
@@ -84,28 +87,28 @@ int main() /*int argc , char** argv  )*/
     //compile the code
     //Passing the root directory of this program
     //and the .cpp or .C file to be tested
-    for( cppFile : cppFiles )
+    for( auto cppFile : cppFiles )
         Compil(cppFile);
 
 
     //get directory to executable in string
     i = 0;
-    for( exec : cppFiles )
+    for( auto exec : cppFiles )
     {
-        nameExec(exec)
-        if( critTest(string(cCurrentPath) + "/tests/", logNames[i],
-                    exec, , studentNames[i]) )
+        nameExec(exec);
+        if( critTest(std::string(cCurrentPath) + "/tests/", logNames[i],
+                    exec, critAccepted, studentNames[i]) )
         {
             //find and run test cases
-            DirCrawl( string(cCurrentPath) + "/tests/", logNames[i], 
-                      exec , passed , tested, string(cCurrentPath) );
+            DirCrawl( std::string(cCurrentPath) + "/tests/", logNames[i], 
+                      exec , passed , tested, std::string(cCurrentPath) );
 
             //write final output to logfile
            percent = FinalLogWrite(logNames[i],passed,tested);
             writeSummaryLog(studentNames[i], percent);
         }
         else
-            writeSummaryLog(studentNames[i], "FAILED")
+            writeSummaryLog(studentNames[i], "FAILED");
     }
     //remove junk files
     system("rm a.out");
@@ -141,16 +144,16 @@ bool run_test_case( std::string test_file, std::string exec,
     std::string ans_file = test_file;
     std::string test_num = "";
     std::string command_string = "";
-    std::ofstream fin;
+    std::ofstream fout;
     int i=0;
     int result;
     int found;
-    fout.open(log_file, std::ios::append | std::ios::out)
-    found = test_file.find("Program_Tester_Generated_test")
+    fout.open(log_file, std::ios::app | std::ios::out);
+    found = test_file.find("Program_Tester_Generated_test");
 
     if(found != std::string::npos )
     {
-        found = tst_file.find_last_of( "t" )
+        found = test_file.find_last_of( "t" );
         ans_file = rootDir+"Program_Tester_Generated_test";
 
         for (i = found+1; test_file[i] != '.'; i++)
@@ -233,8 +236,9 @@ void Compil( std::string progName )
  *********************************************************************************/
 std::string FinalLogWrite( std::string &log_file, int numPassed, int numTest )
 {
-    ofstream fout;
-    fout.open(log_file, ios::append | ios::out);
+    std::string tmp;
+    std::ofstream fout;
+    fout.open(log_file, std::ios::app | std::ios::out);
     //Calculate the number of tests failed.
     int numFailed;
     numFailed = numTest - numPassed;
@@ -251,7 +255,8 @@ std::string FinalLogWrite( std::string &log_file, int numPassed, int numTest )
     fout << "Percent of tests Passed: " << perPassed <<  "%" << std::endl;
     fout << "Percent of tests failed: " << perFailed << "%" << std::endl;
     fout.close();
-    return std::to_str(perPassed)+"%";
+    tmp = std::to_string(perPassed) + "%";
+    return tmp;
 }
 
 /******************************************************************************//**
@@ -285,7 +290,7 @@ void LogWrite( std::ofstream & fout, std::string testNumber, std::string result 
  * to the tester functions
  * @returns none
  *********************************************************************************/
-void DirCrawl( std::string rootDir, std::ofstream &logFile , std::string exec,
+void DirCrawl( std::string rootDir, std::string &logFile , std::string exec,
                int &passed, int &tested, const std::string &masterRootDir )
 {
     DIR* dir = opendir( rootDir.c_str() );	// Open the directory
@@ -307,7 +312,8 @@ void DirCrawl( std::string rootDir, std::ofstream &logFile , std::string exec,
             if ( (int)file->d_type == 4 )
             {
                 //moves into the sub-directory
-                DirCrawl( rootDir + filename + "/" , logFile , exec , passed , tested );
+                DirCrawl( rootDir + filename + "/" , logFile , exec , passed , tested,
+                          masterRootDir);
             }
             else if(filename.find("_crit.tst") == std::string::npos)
             {
@@ -340,7 +346,7 @@ void cppDirCrawl( std::string curDir, std::vector< std::string > &cppFiles )
     int i;
     //scans the current directory for all 
     //types stores how many are found in n and the names in namelist
-    n = scandir(file.c_str(), &namelist, 0, alphasort);
+    n = scandir(curDir.c_str(), &namelist, 0, alphasort);
     if(n == -1)
         return;
     //starts at the second position since 
@@ -350,7 +356,7 @@ void cppDirCrawl( std::string curDir, std::vector< std::string > &cppFiles )
         //checks if the file found is a .cpp file
         if(check_if_cpp_file( namelist[i] -> d_name ))
         {
-            cppFiles.pushback( string( namelist[i] -> d_name ) )
+            cppFiles.push_back( std::string( namelist[i] -> d_name ) );
         }
         //Checks if the current spot is the tests directory and skips it
         else if( check_if_tests_dir( namelist[i] -> d_name ) )
@@ -359,7 +365,7 @@ void cppDirCrawl( std::string curDir, std::vector< std::string > &cppFiles )
         }
         else
         {
-            tmp = string(namelist[i] -> d_name);
+            tmp = std::string(namelist[i] -> d_name);
             cppDirCrawl(curDir + "/" + tmp, cppFiles);
         }
 
@@ -371,7 +377,7 @@ void cppDirCrawl( std::string curDir, std::vector< std::string > &cppFiles )
 
 bool check_if_cpp_file(char name[])
 {
-    std::string tmp = string(name);
+    std::string tmp = std::string(name);
     int found;
 
     found = tmp.find(".cpp");
@@ -383,7 +389,7 @@ bool check_if_cpp_file(char name[])
 
 bool check_if_tests_dir(char name[])
 {
-    std::string tmp = string(name);
+    std::string tmp = std::string(name);
     int found;
 
     found = tmp.find("tests");
@@ -393,16 +399,17 @@ bool check_if_tests_dir(char name[])
     return true;
 }
 
-nameLogFiles( std::vector< std::string > &logNames, time_t &timer, std::vector < std::string > &studentNames )
+void nameLogFiles( std::vector< std::string > &logNames, time_t timer, 
+                   std::vector < std::string > &studentNames )
 {
-    string tmp = "";
+    std::string tmp = "";
     int i;
     //iteraties through the vector creating strings for all log files.
-    for(logName : logNames)
+    for(auto logName : logNames)
     {
         //iterates through a string removing everything after the last occurence of '/'
         //and stops when it is found
-        for( i = logName.length - 1; logName[i] != '/'; i--)
+        for( i = logName.length() - 1; logName[i] != '/'; i--)
             logName.pop_back();
 
         //moves the access pointer one spot to the last occurrence of '/'
@@ -413,59 +420,60 @@ nameLogFiles( std::vector< std::string > &logNames, time_t &timer, std::vector <
             tmp += logName[i];
             i--;
         }
-        std::reverse( tmp.begin(), tmp.end() )
+        std::reverse( tmp.begin(), tmp.end() );
         studentNames.push_back(tmp);
         //appends a .log to tmp and appends the file name to string
-        tmp+="_" + std::string( ctime( timer ) ) + ".log";
+        tmp+="_" + std::string( ctime( &timer ) ) + ".log";
         logName+=tmp;
-        //sets tmp as an empty string for next string in vector that needs to be modified
-        tmp = "":
+        //sets tmp as an empty string for next string in vector that needs
+        //to be modified
+        tmp = "";
     }
 }
 
 void nameExec( std::string &exec )
 {
     int i;
-    for( i = exec.length-1;exec[i]!= '/'; i--)
+    for( i = exec.length()-1;exec[i]!= '/'; i--)
         exec.pop_back();
-    exec+="./a.out"
+    exec+="./a.out";
 }
 
 bool critTest(std::string curDir, std::string logFile, std::string exec,
               std::string pass_fail )
 {
     struct dirent **namelist; //structure in dirent.h stores the file name 
-    bool critResult = true;
     //and the file id number
     int n;
+    static bool critResult = true;
     std::string tmp;
     int i;
     //scans the current directory for all 
     //types stores how many are found in n and the names in namelist
     n = scandir(curDir.c_str(), &namelist, 0, alphasort);
     if(n == -1)
-        return;
+        return critResult;
     //starts at the second position since 
     //the first two files found are the . and .. directories
     for(i = 2; i<n; i++)
     {
         if(std::string(namelist[i] -> d_name).find("_crit.tst") != std::string::npos)
         {
-            if(runCritTest( std::string(nameList[i] -> d_name), exec, logFile)
+            if(runCritTst( std::string(namelist[i] -> d_name), exec, logFile))
             {
                     critResult = false;
                     pass_fail = "FAILED";
             }
         }
-
         else if( (int)namelist[i] -> d_type == 4 )
-            critTest(curDir + string(namelist[i] -> d_name) + '/', logFile, exec,
+            critTest(curDir + std::string(namelist[i] -> d_name) + '/', logFile, exec,
                                                                       pass_fail);
     }
     for( i = 0; i < n; i++ )
         delete []namelist[i];
 
     delete []namelist;
+    return critResult;
 }
 
 bool runCritTst( std::string critTst, std::string exec, std::string logFile) 
@@ -474,7 +482,6 @@ bool runCritTst( std::string critTst, std::string exec, std::string logFile)
     std::string ans_file = critTst;
     std::string test_num = "";
     std::string command_string = "";
-    int i;
     int result;
 
 
@@ -491,7 +498,7 @@ bool runCritTst( std::string critTst, std::string exec, std::string logFile)
 
     //command string = "executable < case.tst > case.out"
     //run the program with input from .tst and pipe output to .out
-    command_string = exec + " < " + test_file + " > " + out_file;
+    command_string = exec + " < " + critTst + " > " + out_file;
     //execute the program
     std::system(command_string.c_str());
 
@@ -510,10 +517,10 @@ bool runCritTst( std::string critTst, std::string exec, std::string logFile)
 
     if(result == 0)
     {
-        critLogWrite( logFile, true, tst_file );
+        critLogWrite( logFile, true, critTst );
         return false;
     }
-    critLogWrite( logFile, false, tst_file );
+    critLogWrite( logFile, false, critTst );
     return true;
 
 }
