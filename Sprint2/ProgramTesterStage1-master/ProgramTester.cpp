@@ -41,6 +41,11 @@ bool critTest(std::string curDir, std::string logFile, std::string exec,
 bool runCritTst(std::string critTst , std::string exec, std::string logFile);
 bool check_if_cpp_file(char name[]);
 bool check_if_tests_dir(char name[]);
+void cleanUpGeneratedTests();
+void writeSummaryLog( std::string student_name, std::string result,
+                      const std::string &root_directory );
+void critLogWrite( std::string log_file_name, bool passed_crit_tests, 
+                   std::string test_file_name );
 
 
 /******************************************************************************//**
