@@ -598,3 +598,110 @@ void prompt()
   }while(flag == false);
   
 }
+
+
+/*****************************************************************************
+ * @Author: Charles Parsons
+ *
+ * @Description Writes to the student log file for the results of the critical
+ *              tests.
+ *
+ * @Params
+ *
+ * ***************************************************************************/
+void critLogWrite( std::string log_file_name, bool passed_crit_tests, 
+                   std::string test_file_name )
+{
+    std::ofstream fout;
+    int pos;
+    std::string temp_test_file_name = test_file_name;
+
+    //parse test file name
+    pos = temp_test_file_name.find_last_of( '/' );
+    if( pos != std::string::npos )
+    {
+       temp_test_file_name = temp_test_file_name.substr( pos + 1 ); 
+    }
+    else
+    {
+        std::cerr << "Could not get test file name." << std::endl;
+        return;
+    }
+    
+    //open class log summary file for appending
+    fout.open( log_file_name, std::ios::out | std::ios::app );
+
+    if( !fout )
+    {
+        std::cerr << "Failed to open student log file." << std::endl;
+    }
+
+    //if critical tests are not passed, write student name and "FAILED"
+    //to log summary file
+    if( !passed_crit_tests )
+    {
+        //write to student log file
+        //test_name FAILED
+        fout << std::setw( 50 ) << temp_test_file_name << std::setw( 20 ) <<
+                "FAILED" << std::endl;
+    }
+    else
+    {
+        //write to student log file
+        //test_name PASSED
+        fout << std::setw( 50 ) << temp_test_file_name << std::setw( 20 ) << 
+                "PASSED" << std::endl;
+    }
+
+    fout.close();
+}
+
+/*****************************************************************************
+ * @Author: Charles Parsons
+ *
+ * @Description: Writes a line to the class summary log file. This is an
+ *              entry for a single student.
+ *
+ * @Param[in] student_name - the name of the student
+ * @Param[in] result - a string with either "FAILED" if they failed one or more
+ *                     critical tests or a percentage representing the tests
+ *                     the student passed
+ * @Param[in] root_directory - a string with the root directory
+ *
+ *
+ ****************************************************************************/
+
+void writeSummaryLog( std::string student_name, std::string result,
+                      const std::string &root_directory )
+{
+    std::ofstream fout;
+    std::string summary_file_name;
+
+    summary_file_name = root_directory + "class_summary.log";
+    fout.open( summary_file_name.c_str(), std::ios out| std::ios app );
+
+    fout << std::setw( 50 ) << student_name << std::setw( 20 ) << result <<
+            std::endl;
+ 
+    fout.close();
+}
+
+/******************************************************************************
+ * @Author: Charles Parsons
+ *
+ * @Description: Removes all generated test and answer files
+ *
+ * ***************************************************************************/
+void cleanUpGeneratedTests()
+{
+    std::string command_string;
+
+    //the command string for removing all of our generated test cases and
+    //their answer files
+    command_string = "rm Program_Tester_Generated*";
+
+    //use the command string
+    system( command_string.c_str() );
+
+    std::cerr << "This house is clean." << std::endl;
+}
