@@ -24,7 +24,7 @@ void LogWrite( std::ofstream & fout, std::string testNumber, std::string result 
 void DirCrawl( std::string rootDir , std::ofstream &logFile , std::string exec ,
         int &passed , int &tested );
 void cppDirCrawl( std::string curDir, std::vector< std::string > &cppFiles );
-void nameLogFiles( std::vector< std::string > &logNames );
+void nameLogFiles( std::vector< std::string > &logNames, time_t &timer);
 void nameExec( std::string &exec );
 void critTest(std::string curDir, std::string logFile, std::string exec std::string pass_fail );
 bool runCritTst( string(namelist[i]->d_name), exec, logFile);
@@ -57,16 +57,13 @@ int main() /*int argc , char** argv  )*/
     cppDirCrawl(string(cCurrentPath), cppFiles)
 
         //creates a copy of the vector of strings holding the cpp files
-    logNames = std::vector(cppFiles);
-
-    //Modifies strings to use student directory name in log file name.
-    nameLogFiles(logNames);
+        logNames = std::vector(cppFiles);
 
     //getting the current time
     time( &timer );
-    //Just need to print it out to the log file first thing.
-    logfile << "--------------------" << std::endl;
-    logfile << ctime( &timer ) << std::endl;
+
+    //Modifies strings to use student directory name in log file name.
+    nameLogFiles(logNames, timer);
 
     //compile the code
     //Passing the root directory of this program
@@ -372,9 +369,9 @@ bool check_if_tests_dir(char name[])
     return true;
 }
 
-nameLogFiles( std::vector< std::string > &logNames )
+nameLogFiles( std::vector< std::string > &logNames, time_t &timer )
 {
-    string tmp;
+    string tmp = "";
     int i;
     //iteraties through the vector creating strings for all log files.
     for(logName : logNames)
@@ -393,7 +390,7 @@ nameLogFiles( std::vector< std::string > &logNames )
             i--;
         }
         //appends a .log to tmp and appends the file name to string
-        tmp+=".log";
+        tmp+="_" + std::string( ctime( timer ) ) + ".log";
         logName+=tmp;
         //sets tmp as an empty string for next string in vector that needs to be modified
         tmp = "":
@@ -427,20 +424,20 @@ void critTest(std::string curDir, std::string logFile, std::string exec std::str
         if(string(namelist[i] -> d_name).find("_crit.tst") != std::string::npos)
         {
             if(runCritTest( std::string(nameList[i] -> d_name), exec, logFile)
-                    pass_fail = "FAILED"
-
+                    pass_fail = "FAILED";
         }
-                    //Goes into next directory to search for more *_crit.tst files
+
         else if( (int)namelist[i] -> d_type == 4 )
-                    critTest(curDir + string(namelist[i] -> d_name) + '/', logFile, exec, pass_fail);
+            critTest(curDir + string(namelist[i] -> d_name) + '/', logFile, exec, pass_fail);
+    }
+    for( i = 0; i < n; i++ )
+        delete []namelist[i];
 
-        }
-        for( i = 0; i < n; i++ )
-            delete []namelist[i];
-        delete []namelist;
+    delete []namelist;
 }
 
 bool runCritTst( std::string critTst, std::string exec, std::string logFile)
 {
-
+    
 }
+         
