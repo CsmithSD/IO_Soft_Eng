@@ -2,7 +2,7 @@
 CC = g++
 
 # compiler options
-CFLAGS = -std=c++11 -c -Wall
+CFLAGS = -std=c++11 -c
 
 all: tester
 
