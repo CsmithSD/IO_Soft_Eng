@@ -678,7 +678,11 @@ void prompt()
  * @Description Writes to the student log file for the results of the critical
  *              tests.
  *
- * @Params
+ * @Param[in] log_file_name - the name of the log file to be written
+ * @Param[in] passed_crit_tests - true if crit test was passed and false if it
+ *                                was failed
+ * @Param[in] test_file_name - the path, including name, to the test file that
+ *                             was run
  *
  * ***************************************************************************/
 void critLogWrite( std::string log_file_name, bool passed_crit_tests, 
@@ -714,15 +718,15 @@ void critLogWrite( std::string log_file_name, bool passed_crit_tests,
     {
         //write to student log file
         //test_name FAILED
-        fout << std::setw( 50 ) << temp_test_file_name << std::setw( 20 ) <<
-                "FAILED" << std::endl;
+        fout << std::left << std::setw( 50 ) << temp_test_file_name <<
+                std::setw( 20 ) << "FAILED" << std::endl << std::right;
     }
     else
     {
         //write to student log file
         //test_name PASSED
-        fout << std::setw( 50 ) << temp_test_file_name << std::setw( 20 ) << 
-                "PASSED" << std::endl;
+        fout << std::left << std::setw( 50 ) << temp_test_file_name <<
+                std::setw( 20 ) << "PASSED" << std::endl << std::right;
     }
 
     fout.close();
@@ -759,8 +763,8 @@ void writeSummaryLog( std::string student_name, std::string result,
 
     fout.open( summary_file_name.c_str(), std::ios::app | std::ios::out );
 
-    fout << std::setw( 50 ) << student_name << std::setw( 20 ) << result <<
-            std::endl;
+    fout << std::left << std::setw( 50 ) << student_name << std::setw( 20 )
+         << result << std::endl << std::right;
  
     fout.close();
 }
