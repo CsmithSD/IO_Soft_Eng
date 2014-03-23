@@ -1,0 +1,44 @@
+% !TEX root = SystemTemplate.tex
+
+\chapter{Overview and concept of operations}
+
+The overview should take the form of an executive summary.  Give the reader a feel 
+for the purpose of the document, what is contained in the document, and an idea 
+of the purpose for the system or product. 
+
+
+\section{Scope}
+The purpose of this project is to create a program that will run another program against test documents and output the 
+results into another file forthe user. The program is specifically geared toward computer science professors for their use in 
+grading student programs. This program will compile and run the submitted program imputting the test data. The results, which are saved to a text document, are evaluated and and percentage of pass/fail is also computed and saved in the
+document.
+
+
+\section{Purpose}
+This system is designed in order to make it easier for professors to grade their students programs. The test files need only be 
+in the same directory (or within a subdirectory) as the program to be compiled and run. Also, the output is to be detailed 
+enough so that the user knows exactly which test cases passed and which failed.
+
+
+\subsection{Program Compiler}
+Though rather simple to code this is a mojor component because it depends on which system the program is running as to
+how the program is compiled. This program is made to run using the gcc command.
+
+\subsection{Test File Location}
+Also a simple but necessary component to our system. The program is going to run every file ending in ".tst" within the same
+directory as the progam itself. Therefore, searching the current working directory as well as every subdirectory is very 
+important to ensure every test case is run.
+
+\subsection{Test Case Evaluation}
+Here is the most critical part of the program. This is where the tests are read in by our program and the results evaluated. 
+Onceevaluated the results are stored in a text file for the user to review. 
+
+\section{Systems Goals}
+The goals of our system is to successfully compile and run a program with the test files in the directory. Then to output the result of the tests in a text file. 
+
+\section{System Overview and Diagram}
+
+
+\section{Technologies Overview}
+
+

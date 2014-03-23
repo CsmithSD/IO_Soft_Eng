@@ -1,30 +1,3 @@
-/******************************************************************************
-*
-*
-* Program:Testing Suite
-* Author: Intolerable Optimists: Charles Parsons, Christopher Smith, Jarod Hogan
-* Class: Software Engineering
-* Instructor:   Dr. Logar
-* Date: 23 March 2014
-* Description:The program will first ask the user if they wish to generate test
-*             cases and if yes it will ask if int or float. After the prompts 
-*             are completed it then will crawl through the subdirectories, find 
-*             each program (.cpp file), compile, run tests in the tests 
-*             subdirectory, and create a log file for each student. The program 
-*             will create a summary file for all the programs run. At the end
-*             it will ask the user if they wish to delete all the files generated
-*             by this program and will remove them if y/Y. Else it will just exit.
-*
-* Input:
-* Output: This program runs other programs and outputs their failures 
-*         and passes to a log file and the overall results to a summary 
-*         file in the root directory that the program is ran from
-* Compilation instructions: There is a makefile associated with this program. 
-*                           All that is needed to compile is to use make.
-* Usage: ./ProgramTester
-* Known bugs/missing features: No known bugs           
-*******************************************************************************/
-
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -41,9 +14,7 @@
 #include <vector>
 #include <algorithm>
 
-/******************************************************************************
- *                              GLOBAL CONSTANTS
- * ***************************************************************************/
+
 const int MAX_LIST = 200;
 const int MAX_TEST = 100;
 
@@ -51,58 +22,34 @@ const int MAX_TEST = 100;
  *                               FUNCTION PROTOTYPES
  *********************************************************************************/
 bool run_test_case( std::string test_file, std::string exec,
-        std::string &log_file,const std::string &rootDir, 
-        const std::string &studentName);
-
-void Compil( std::string progName, std::string studentName);
-
+        std::string &log_file,const std::string &rootDir );
+void Compil( std::string progName );
 std::string FinalLogWrite( std::string &log_file, int numPassed, int numTest );
-
 void LogWrite( std::ofstream & fout, std::string testNumber, std::string result );
-
 void DirCrawl( std::string rootDir , std::string &logFile , std::string exec ,
-        int &passed , int &tested, const std::string &masterRootDir, 
-        const std::string &studentName);
-
+        int &passed , int &tested, const std::string &masterRootDir);
 void generateTst(std::string choice);
-
 void prompt();
-
 void sysProg(std::string test);
-
-void cppDirCrawl( std::string curDir, std::vector< std::string > &cppFiles, 
-        const std::string &masterRootDir );
-
+void cppDirCrawl( std::string curDir, std::vector< std::string > &cppFiles );
 void nameLogFiles( std::vector< std::string > &logNames, time_t timer,
-        std::vector< std::string > &studentNames);
-
+                   std::vector< std::string > &studentNames);
 void nameExec( std::string &exec );
+bool critTest(std::string curDir, std::string logFile, std::string exec, 
+              std::string pass_fail);
 
-std::string critTest(std::string curDir, std::string logFile, std::string exec, 
-        std::string pass_fail, const std::string &studentName);
-
-bool runCritTst(std::string critTst , std::string exec, std::string logFile, 
-        const std::string &studentName);
-
+bool runCritTst(std::string critTst , std::string exec, std::string logFile);
 bool check_if_cpp_file(char name[]);
-
+bool check_if_tests_dir(char name[]);
 void cleanUpGeneratedTests();
-
 void writeSummaryLog( std::string student_name, std::string result,
-        time_t timer );
-
+                      time_t timer );
 void critLogWrite( std::string log_file_name, bool passed_crit_tests, 
-        std::string test_file_name );
+                   std::string test_file_name );
 
 
 /******************************************************************************//**
- * Function: int main()
- * Author:Adventure Line, Christopher Smith, Charles Parsons
  *
- * Description:This is the start of the program and is used to pass variables between
- *             Functions and to call the prompting functions
- *
- * Parameters: None
  *
  *********************************************************************************/
 int main() /*int argc , char** argv  )*/
@@ -118,11 +65,11 @@ int main() /*int argc , char** argv  )*/
     time_t timer;
     std::string filename;
     std::string percent;
+    bool foundFlag = false;
     std::string cppFile;
     std::vector< std::string > cppFiles;
     std::vector< std::string > studentNames;
     int i;
-    int exists;
 
     //Asks the user if they want tst files generated
     prompt();
@@ -131,7 +78,7 @@ int main() /*int argc , char** argv  )*/
     getcwd(cCurrentPath , sizeof(cCurrentPath) );
 
     //finds all the cpp files below current directory
-    cppDirCrawl(std::string(cCurrentPath), cppFiles, std::string(cCurrentPath));
+    cppDirCrawl(std::string(cCurrentPath), cppFiles);
 
     //creates a copy of the vector of strings holding the cpp files
     logNames = std::vector< std::string >(cppFiles);
@@ -141,50 +88,42 @@ int main() /*int argc , char** argv  )*/
 
     //Modifies strings to use student directory name in log file name.
     nameLogFiles( logNames, timer, studentNames );
+
     //compile the code
     //Passing the root directory of this program
     //and the .cpp or .C file to be tested
-    i=0;
     for( auto cppFile : cppFiles )
-    {
-        Compil(cppFile, studentNames[i]);
-        i++;
-    }
+        Compil(cppFile);
+
 
     //get directory to executable in string
     i = 0;
     for( auto exec : cppFiles )
     {
-        //reset to passed for next executable file
-        critAccepted = "PASSED";
         nameExec(exec);
-        //If a _crit.tst file fails then the else statement is executed instead of going into the normal .tst files
-        if( critTest(std::string(cCurrentPath), logNames[i],
-                    exec, critAccepted, studentNames[i])!="FAILED")
+        if( critTest(std::string(cCurrentPath) + "/tests/", logNames[i],
+                    exec, critAccepted ))
         {
             //find and run test cases
-            DirCrawl( std::string(cCurrentPath), logNames[i], 
-                    exec , passed , tested, std::string(cCurrentPath), studentNames[i] );
+            DirCrawl( std::string(cCurrentPath) + "/tests/", logNames[i], 
+                      exec , passed , tested, std::string(cCurrentPath) );
 
-            //write final output to logfile for current student
+            //write final output to logfile
             percent = FinalLogWrite(logNames[i], passed, tested);
             writeSummaryLog(studentNames[i], percent,timer);
-            passed = 0;
-            tested = 0;
         }
-        //Writes FAILED to summarylog file if a _crit.tst fails
         else
             writeSummaryLog(studentNames[i], "FAILED",timer);
-        i++;
     }
-    //prompts the user if they would like all files generated by this program to be removed
-    cleanUpGeneratedTests();
+    //remove junk files
+    system("rm a.out");
+    system("rm nul");
 
     return 0;
 }
 
 /******************************************************************************//**
- * @author Andrew Koc, Christopher Smith
+ * @author Andrew Koc
  * 
  * @Description
  * This function takes two strings, one the directory to a test case file, and
@@ -197,16 +136,14 @@ int main() /*int argc , char** argv  )*/
  *
  * @param[in] - test_file the directory of the .tst file
  * @param[in] - exec the directory of the executable program to be tested
- * @param[out] - log_file is the name of the log file to be opened
- * @param[in] - rootDir keeps track of the working directory
- * @param[in] - studentName student name associated with executable
+ * @param[out] - log_file the ofstream to the log file
  *
  * @returns true - the program passed the test
  * @returns false - the program failed the test
  *
  *********************************************************************************/
 bool run_test_case( std::string test_file, std::string exec,
-        std::string &log_file, const std::string &rootDir, const std::string& studentName)
+        std::string &log_file, const std::string &rootDir)
 {
     std::string out_file = test_file;
     std::string ans_file = test_file;
@@ -215,31 +152,28 @@ bool run_test_case( std::string test_file, std::string exec,
     std::ofstream fout;
     int i=0;
     int result;
-    int pos;
     int found;
     fout.open(log_file, std::ios::app | std::ios::out);
     found = test_file.find("Program_Tester_Generated_test");
 
-    pos = test_file.find_last_of("/");
-
-    test_num = test_file.substr( pos + 1 );
-    test_num.resize(test_num.size()-4);
-
     if(found != std::string::npos )
     {
-        found = test_file.find( "test" );
-        ans_file = rootDir+"/"+ test_num;
+        found = test_file.find_last_of( "t" );
+        ans_file = rootDir+"Program_Tester_Generated_test";
+
+        for (i = found+1; test_file[i] != '.'; i++)
+            ans_file+=test_file[i];
 
         ans_file+=".ans";
     }
     //get text for .out file and .ans file
     //remove tst
-    out_file.resize(out_file.size() - 4);
+    out_file.resize(out_file.size() - 3);
     //add out so we have case#.out
-    out_file += "_" +studentName + ".out";
+    out_file += "out";
 
     //remove tst
-    ans_file.resize(ans_file.size() - 3);
+    ans_file.resize(out_file.size() - 3);
     //add ans so we have case#.ans
     ans_file += "ans";
 
@@ -255,7 +189,7 @@ bool run_test_case( std::string test_file, std::string exec,
     // the --ignore ignores whitespace on each line, so trailing spaces
     // or newlines aren't flagged as incorrect
     // > pipes the output into a file called nul
-    command_string = "diff --ignore-all-space " + out_file + " " + ans_file+ " > nul";
+    command_string = "diff --ignore-all-space " + out_file + " " + ans_file + " > nul";
     result = std::system(command_string.c_str());
 
     //passed test
@@ -284,11 +218,11 @@ bool run_test_case( std::string test_file, std::string exec,
  *
  * @returns none
  *********************************************************************************/
-void Compil( std::string progName, std:: string studentName)
+void Compil( std::string progName )
 {
     //creat the system command and execute it.
     std::string command;
-    command = "g++ " + progName + " -o " +studentName+ "_exec";
+    command = "g++ " + progName;
     system( command.c_str() );
 }
 
@@ -345,8 +279,7 @@ std::string FinalLogWrite( std::string &log_file, int numPassed, int numTest )
  *********************************************************************************/
 void LogWrite( std::ofstream & fout, std::string testNumber, std::string result )
 {
-    fout << std::left << std::setw(50)<< testNumber << std::setw(20) <<
-        result.c_str() << std::endl << std::right;
+    fout << testNumber << ": " << result.c_str() << std::endl;
 }
 
 /******************************************************************************//**
@@ -363,55 +296,53 @@ void LogWrite( std::ofstream & fout, std::string testNumber, std::string result 
  * @returns none
  *********************************************************************************/
 void DirCrawl( std::string rootDir, std::string &logFile , std::string exec,
-        int &passed, int &tested, const std::string &masterRootDir, const std::string &studentName)
+               int &passed, int &tested, const std::string &masterRootDir )
 {
-    struct dirent** file;	// File entry structure from dirent.h
+    DIR* dir = opendir( rootDir.c_str() );	// Open the directory
+    struct dirent* file;	// File entry structure from dirent.h
     std::string filename;	//used in finding if a file has the extention .tst
-    int n;
-    n =scandir(rootDir.c_str(), &file, 0, alphasort);
-    if(n == -1)
-        return;
 
     // Read each file one at a time
     // Readdir returns next file in the directory, returns null if no other files exist
-    for(int i = 2; i < n; i++)
+    while( ( file = readdir(dir)) != NULL )
     {
         //place file name into string filename for easier checking
-        filename = std::string(file[i]->d_name);
+        filename = file->d_name;
 
-        // checks if the file is a subdirectory, 4 is the integer idetifyer
-        // for the dirent struct on Lixux systems
-        if(filename != "." && filename != ".." &&  (int)file[i]->d_type == DT_DIR )
+        // skip over the directories "." and ".."
+        if ( filename != "." && filename != ".." )
         {
-            //moves into the sub-directory
-            DirCrawl( rootDir + "/" + filename , logFile , exec , passed , tested,
-                    masterRootDir, studentName);
-        }
-        else if(filename.find("_crit.tst") == std::string::npos)
-        {
-            // checks if the file has a .tst in it. string find returns
-            // string::npos if the substring cannot be found
-            if ( filename.find( ".tst") != std::string::npos )
+            // checks if the file is a subdirectory, 4 is the integer idetifyer
+            // for the dirent struct on Lixux systems
+            if ( (int)file->d_type == 4 )
             {
-                // pass the file onto the grader 
-                if (run_test_case( rootDir + "/" + filename , exec , logFile,
-                            masterRootDir, studentName))
+                //moves into the sub-directory
+                DirCrawl( rootDir + filename + "/" , logFile , exec , passed , tested,
+                          masterRootDir);
+            }
+            else if(filename.find("_crit.tst") == std::string::npos)
+            {
+                // checks if the file has a .tst in it. string find returns
+                // string::npos if the substring cannot be found
+                if ( filename.find( ".tst") != std::string::npos )
                 {
-                    passed += 1;
+                    // pass the file onto the grader 
+                    if (run_test_case( rootDir + '/' + filename , exec , logFile,
+                                                                masterRootDir) )
+                    {
+                        passed += 1;
+                    }
+                    tested += 1;
                 }
-                tested += 1;
             }
         }
     }
-    for( int i = 0; i < n; i++)
-        delete []file[i];
-    delete []file;
-
+    closedir(dir);
 }
 
 
 
-void cppDirCrawl( std::string curDir, std::vector< std::string > &cppFiles, const std::string &masterRootDir)
+void cppDirCrawl( std::string curDir, std::vector< std::string > &cppFiles )
 {
     struct dirent **namelist; //structure in dirent.h stores the file name 
     //and the file id number
@@ -428,17 +359,21 @@ void cppDirCrawl( std::string curDir, std::vector< std::string > &cppFiles, cons
     for(i=2; i<n; i++)
     {
         //checks if the file found is a .cpp file
-        if( curDir != masterRootDir && namelist[i]->d_type == DT_REG && check_if_cpp_file( namelist[i] -> d_name ))
+        if(check_if_cpp_file( namelist[i] -> d_name ))
         {
-            cppFiles.push_back( curDir + std::string( namelist[i] -> d_name ) );
+            cppFiles.push_back( std::string( namelist[i] -> d_name ) );
         }
         //Checks if the current spot is the tests directory and skips it
-        else if( namelist[i] -> d_type == DT_DIR)
+        else if( check_if_tests_dir( namelist[i] -> d_name ) )
         {
-
-            tmp = std::string(namelist[i] -> d_name);
-            cppDirCrawl(curDir + "/" + tmp+"/", cppFiles, masterRootDir);
+            continue;
         }
+        else
+        {
+            tmp = std::string(namelist[i] -> d_name);
+            cppDirCrawl(curDir + "/" + tmp, cppFiles);
+        }
+
     }
     for( i = 0; i < n; i++)
         delete []namelist[i];
@@ -450,48 +385,51 @@ bool check_if_cpp_file(char name[])
     std::string tmp = std::string(name);
     int found;
 
-    found = tmp.find(".cpp",tmp.length()-4);
-    if(found != std::string::npos)
-    {
-        return true;
-    }
-    return false;
+    found = tmp.find(".cpp");
+
+    if(found == std::string::npos)
+        return false;
+    return true;
+}
+
+bool check_if_tests_dir(char name[])
+{
+    std::string tmp = std::string(name);
+    int found;
+
+    found = tmp.find("tests");
+
+    if(found == std::string::npos)
+        return false;
+    return true;
 }
 
 void nameLogFiles( std::vector< std::string > &logNames, time_t timer, 
-        std::vector < std::string > &studentNames )
+                   std::vector < std::string > &studentNames )
 {
     std::string tmp = "";
     int i;
-    int j;
     //iteraties through the vector creating strings for all log files.
-    for(j = 0; j < logNames.size(); j++)
+    for(auto logName : logNames)
     {
         //iterates through a string removing everything after the last occurence of '/'
         //and stops when it is found
-        for( i = logNames[j].length() - 1; logNames[j][i] != '/'; i--)
-            logNames[j].pop_back();
+        for( i = logName.length() - 1; logName[i] != '/'; i--)
+            logName.pop_back();
+
         //moves the access pointer one spot to the last occurrence of '/'
         i--;
         //stores the student name in tmp up to the second to last '/'
-        while(logNames[j][i] != '/')
+        while(logName[i] != '/')
         {
-            tmp += logNames[j][i];
+            tmp += logName[i];
             i--;
         }
         std::reverse( tmp.begin(), tmp.end() );
         studentNames.push_back(tmp);
         //appends a .log to tmp and appends the file name to string
         tmp+="_" + std::string( ctime( &timer ) ) + ".log";
-        for(int i = 14; i < tmp.length(); i++)
-        {
-            if(tmp[i]==' ')
-                tmp[i] = '_';
-            if(tmp[i] == '\n')
-                tmp.erase(tmp.begin()+i);
-
-        }
-        logNames[j]+=tmp;
+        logName+=tmp;
         //sets tmp as an empty string for next string in vector that needs
         //to be modified
         tmp = "";
@@ -503,46 +441,47 @@ void nameExec( std::string &exec )
     int i;
     for( i = exec.length()-1;exec[i]!= '/'; i--)
         exec.pop_back();
-    exec.pop_back();
-    exec+="_exec";
+    exec+="./a.out";
 }
 
-std::string critTest(std::string curDir, std::string logFile, std::string exec,
-        std::string pass_fail, const std::string &studentName )
+bool critTest(std::string curDir, std::string logFile, std::string exec,
+              std::string pass_fail )
 {
     struct dirent **namelist; //structure in dirent.h stores the file name 
     //and the file id number
     int n;
+    static bool critResult = true;
     std::string tmp;
     int i;
     //scans the current directory for all 
     //types stores how many are found in n and the names in namelist
     n = scandir(curDir.c_str(), &namelist, 0, alphasort);
     if(n == -1)
-        return pass_fail;
+        return critResult;
     //starts at the second position since 
     //the first two files found are the . and .. directories
     for(i = 2; i<n; i++)
     {
         if(std::string(namelist[i] -> d_name).find("_crit.tst") != std::string::npos)
         {
-            if(runCritTst( curDir+"/"+ std::string(namelist[i] -> d_name), exec, logFile, studentName))
+            if(runCritTst( std::string(namelist[i] -> d_name), exec, logFile))
             {
-                pass_fail = "FAILED";
+                    critResult = false;
+                    pass_fail = "FAILED";
             }
         }
         else if( (int)namelist[i] -> d_type == 4 )
-            pass_fail = critTest(curDir + "/" + std::string(namelist[i] -> d_name)
-                    , logFile, exec, pass_fail, studentName);
+            critResult = critTest(curDir + std::string(namelist[i] -> d_name)
+                                  + '/', logFile, exec, pass_fail);
     }
     for( i = 0; i < n; i++ )
         delete []namelist[i];
 
     delete []namelist;
-    return pass_fail;
+    return critResult;
 }
 
-bool runCritTst( std::string critTst, std::string exec, std::string logFile, const std::string &studentName) 
+bool runCritTst( std::string critTst, std::string exec, std::string logFile) 
 {
     std::string out_file = critTst;
     std::string ans_file = critTst;
@@ -553,12 +492,12 @@ bool runCritTst( std::string critTst, std::string exec, std::string logFile, con
 
     //get text for .out file and .ans file
     //remove tst
-    out_file.resize(out_file.size() - 4);
+    out_file.resize(out_file.size() - 3);
     //add out so we have case#.out
-    out_file +="_" + studentName + ".out";
+    out_file += "out";
 
     //remove tst
-    ans_file.resize(ans_file.size() - 3);
+    ans_file.resize(out_file.size() - 3);
     //add ans so we have case#.ans
     ans_file += "ans";
 
@@ -574,9 +513,10 @@ bool runCritTst( std::string critTst, std::string exec, std::string logFile, con
     // the --ignore ignores whitespace on each line, so trailing spaces
     // or newlines aren't flagged as incorrect
     // > pipes the output into a file called nul
-    command_string = "diff --ignore-all-space " + out_file + " " + ans_file + " > nul";
+    command_string = "diff --ignore-all-space " + out_file + " " + ans_file 
+                                                           + " > nul";
     result = std::system(command_string.c_str());
-
+    
     command_string = "rm " + out_file;
     std::system(command_string.c_str() );
 
@@ -606,9 +546,6 @@ bool runCritTst( std::string critTst, std::string exec, std::string logFile, con
  *********************************************************************************/
 void generateTst(std::string choice)
 {
-<<<<<<< HEAD
-  
-  //variables
   std::ofstream fout;
   int randNum,i,j;
   double randNum2;
@@ -623,16 +560,13 @@ void generateTst(std::string choice)
   srand(time(NULL));  
   max1 = rand() % MAX_TEST + 1;
 
-  //Generates list of numbers (ints or floats) 
   for(j = 0; j < max1; j++)
   {
-    //names test file   
     temp = j;
     convert << temp;
     num = convert.str();
     convert.str("");
     filename = filePath + name + num + ext;
-
     fout.open(filename.c_str());
     if(!fout)
     {
@@ -641,82 +575,43 @@ void generateTst(std::string choice)
     if(choice == "int")
     {
         max2 = rand() % MAX_LIST + 1;
-=======
-    std::ofstream fout;
-    int randNum,i,j;
-    double randNum2;
-    std::string filePath = "./tests/";
-    std::string name = "Program_Tester_Generated_test";
-    std::string ext = ".tst";
-    std::string num;
-    std::string filename;
-    std::ostringstream convert;
-    int max1, max2, temp;
->>>>>>> 0054f03f2042d710de3e8fd598c97cc2f6bf1893
 
-    srand(time(NULL));  
-    max1 = rand() % MAX_TEST + 1;
-
-    for(j = 0; j < max1; j++)
-    {
-        temp = j;
-        convert << temp;
-        num = convert.str();
-        convert.str("");
-        filename = filePath + name + num + ext;
-        fout.open(filename.c_str());
-        if(!fout)
+        for(i= 0; i < max2; i++)
         {
-            std::cout << "Could not open " << filename << std::endl;
+          //generate rand number
+          randNum = rand();
+
+          fout << randNum << std::endl;
+   
         }
-        if(choice == "int")
-        {
-            max2 = rand() % MAX_LIST + 1;
+    }//end if
+    else
+    {
+      //initialize random seed
+      srand(time(NULL));  
+      max2 = rand() % MAX_LIST + 1;
 
-<<<<<<< HEAD
+      for(i= 0; i < max2; i++)
+      {
+        //generate rand number
+        randNum = rand();
+        randNum2 = rand();
+ 
+        while(randNum2 > 0)
+        {
+          randNum2 /= 10;
+        }
+        randNum2 = double(randNum) + randNum2;
+    
+        fout << randNum2 << std::endl;
+      }//end For
+    }//end Else
+
     fout.close();
   
-    //runs golden.cpp with test file just generated
+ 
     sysProg(filename);
   }//end for loop
-=======
-            for(i= 0; i < max2; i++)
-            {
-                //generate rand number
-                randNum = rand();
-
-                fout << randNum << std::endl;
-
-            }
-        }//end if
-        else
-        {
-            //initialize random seed
-            srand(time(NULL));  
-            max2 = rand() % MAX_LIST + 1;
-
-            for(i= 0; i < max2; i++)
-            {
-                //generate rand number
-                randNum = rand();
-                randNum2 = rand();
-
-                while(randNum2 > 0)
-                {
-                    randNum2 /= 10;
-                }
-                randNum2 = double(randNum) + randNum2;
-
-                fout << randNum2 << std::endl;
-            }//end For
-        }//end Else
-
-        fout.close();
-
-
-        sysProg(filename);
-    }//end for loop
->>>>>>> 0054f03f2042d710de3e8fd598c97cc2f6bf1893
 }
 
 /******************************************************************************//**
@@ -733,33 +628,16 @@ void generateTst(std::string choice)
  *********************************************************************************/
 void sysProg(std::string test)
 {
-<<<<<<< HEAD
-  
-  //creates strings to compile golden.cpp and run it with test cases
   std::string compile = "g++ -o test golden.cpp ";
   std::string run = "./test";
   std::string answer = test.substr(8, test.size());
   answer = answer.substr(0, answer.size()-3) + "ans";
 
-  //Compiles golden.cpp
   system(compile.c_str());
-
-  //runs golden.cpp with redirected output
   run = run + " < " + test + " > " + answer;
+
   system(run.c_str());
  
-=======
-    std::string compile = "g++ -o test golden.cpp ";
-    std::string run = "./test";
-    std::string answer = test.substr(8, test.size());
-    answer = answer.substr(0, answer.size()-3) + "ans";
-
-    system(compile.c_str());
-    run = run + " < " + test + " > " + answer;
-
-    system(run.c_str());
-
->>>>>>> 0054f03f2042d710de3e8fd598c97cc2f6bf1893
 }
 
 
@@ -774,64 +652,40 @@ void sysProg(std::string test)
  *********************************************************************************/
 void prompt()
 {
-<<<<<<< HEAD
-  //variables
-  char ans; //stores users answer
-  std::string choice;//stores users choice of int or float
-  bool flag = false;//flag for loop
+  char ans;
+  std::string choice;
+  bool flag = false;
 
 
   do
   {
-    //Prompt user test cases
     std::cout << "Would you like to generate test cases?(Y(y)/N(n)): ";
     std::cin >> ans;
 
     ans = tolower(ans);
-   
-    //Evaluates the users choice of int or float
     switch(ans)
     { 
       case 'y':
         std::cout << "Enter choice: ";
         std::cin >> choice;
         if((choice != "int") && (choice != "float"))
-=======
-    char ans;
-    std::string choice;
-    bool flag = false;
-
-
-    do
-    {
-        std::cout << "Would you like to generate test cases?( Y(y) / N(n) ): ";
-        std::cin >> ans;
-
-        ans = tolower(ans);
-        switch(ans)
->>>>>>> 0054f03f2042d710de3e8fd598c97cc2f6bf1893
         { 
-            case 'y':
-                std::cout << "Enter choice: ";
-                std::cin >> choice;
-                if((choice != "int") && (choice != "float"))
-                { 
-                    std::cout << "Bad Choice" << std::endl;
-                    break;
-                }
-
-                generateTst(choice);
-                flag = true;
-                break;
-            case 'n':
-                flag =true;
-                break;
-            default:
-                std::cout << "Your choice " << ans << " is not a valid option." << std::endl;
-                std::cout << "Valid options are Y,y,N,n only!" << std::endl;
+          std::cout << "Bad Choice" << std::endl;
+          break;
         }
-    }while(flag == false);
-
+        
+        generateTst(choice);
+        flag = true;
+        break;
+      case 'n':
+        flag =true;
+        break;
+      default:
+        std::cout << "Your choice " << ans << " is not a valid option." << std::endl;
+        std::cout << "Valid options are Y,y,N,n only!" << std::endl;
+    }
+  }while(flag == false);
+  
 }
 
 
@@ -841,15 +695,11 @@ void prompt()
  * @Description Writes to the student log file for the results of the critical
  *              tests.
  *
- * @Param[in] log_file_name - the name of the log file to be written
- * @Param[in] passed_crit_tests - true if crit test was passed and false if it
- *                                was failed
- * @Param[in] test_file_name - the path, including name, to the test file that
- *                             was run
+ * @Params
  *
  * ***************************************************************************/
 void critLogWrite( std::string log_file_name, bool passed_crit_tests, 
-        std::string test_file_name )
+                   std::string test_file_name )
 {
     std::ofstream fout;
     int pos;
@@ -859,14 +709,14 @@ void critLogWrite( std::string log_file_name, bool passed_crit_tests,
     pos = temp_test_file_name.find_last_of( '/' );
     if( pos != std::string::npos )
     {
-        temp_test_file_name = temp_test_file_name.substr( pos + 1 ); 
+       temp_test_file_name = temp_test_file_name.substr( pos + 1 ); 
     }
     else
     {
         std::cerr << "Could not get test file name." << std::endl;
         return;
     }
-
+    
     //open class log summary file for appending
     fout.open( log_file_name, std::ios::out | std::ios::app );
 
@@ -881,15 +731,15 @@ void critLogWrite( std::string log_file_name, bool passed_crit_tests,
     {
         //write to student log file
         //test_name FAILED
-        fout << std::left << std::setw( 50 ) << temp_test_file_name <<
-            std::setw( 20 ) << "FAILED" << std::endl << std::right;
+        fout << std::setw( 50 ) << temp_test_file_name << std::setw( 20 ) <<
+                "FAILED" << std::endl;
     }
     else
     {
         //write to student log file
         //test_name PASSED
-        fout << std::left << std::setw( 50 ) << temp_test_file_name <<
-            std::setw( 20 ) << "PASSED" << std::endl << std::right;
+        fout << std::setw( 50 ) << temp_test_file_name << std::setw( 20 ) << 
+                "PASSED" << std::endl;
     }
 
     fout.close();
@@ -911,26 +761,17 @@ void critLogWrite( std::string log_file_name, bool passed_crit_tests,
  ****************************************************************************/
 
 void writeSummaryLog( std::string student_name, std::string result,
-        time_t timer )
+                      time_t timer )
 {
     std::ofstream fout;
     std::string summary_file_name;
 
     summary_file_name = "class_summary_" + std::string(ctime(&timer)) + ".log";
-
-    for(int i = 14; i < summary_file_name.length(); i++)
-    {
-        if(summary_file_name[i]==' ')
-            summary_file_name[i] = '_';
-        if(summary_file_name[i] == '\n')
-            summary_file_name.erase(summary_file_name.begin()+i);
-    }
-
     fout.open( summary_file_name.c_str(), std::ios::app | std::ios::out );
 
-    fout << std::left << std::setw( 50 ) << student_name << std::setw( 20 )
-        << result << std::endl << std::right;
-
+    fout << std::setw( 50 ) << student_name << std::setw( 20 ) << result <<
+            std::endl;
+ 
     fout.close();
 }
 
@@ -943,20 +784,13 @@ void writeSummaryLog( std::string student_name, std::string result,
 void cleanUpGeneratedTests()
 {
     std::string command_string;
-    char choice;
-    system( "rm -rf nul" );
 
-    std::cout << "Would you like program generated tst, ans, and out files, for generated tests, removed? (Y/N): ";
-    std::cin >> choice;
-
-    if(choice != 'y' && choice != 'Y')
-        return;
     //the command string for removing all of our generated test cases and
     //their answer files
-    command_string = "rm -rf Program_Tester_Generated*";
+    command_string = "rm Program_Tester_Generated*";
 
     //use the command string
     system( command_string.c_str() );
-    system( "rm -rf tests/Program_Tester*" );
+
     std::cerr << "This house is clean." << std::endl;
 }
