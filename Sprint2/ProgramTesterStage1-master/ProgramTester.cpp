@@ -166,11 +166,8 @@ bool run_test_case( std::string test_file, std::string exec,
 
     if(found != std::string::npos )
     {
-        found = test_file.find_last_of( "t" );
-        ans_file = rootDir+"/Program_Tester_Generated_test";
-
-        for (i = found+1; test_file[i] != '.'; i++)
-            ans_file+=test_file[i];
+        found = test_file.find( "test" );
+        ans_file = rootDir+"/"+ test_num;
 
         ans_file+=".ans";
     }
