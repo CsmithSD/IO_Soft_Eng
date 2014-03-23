@@ -22,12 +22,12 @@ const int MAX_TEST = 100;
  *                               FUNCTION PROTOTYPES
  *********************************************************************************/
 bool run_test_case( std::string test_file, std::string exec,
-        std::string &log_file,const std::string &rootDir );
-void Compil( std::string progName );
+        std::string &log_file,const std::string &rootDir, const std::string &studentName);
+void Compil( std::string progName, std::string studentName);
 std::string FinalLogWrite( std::string &log_file, int numPassed, int numTest );
 void LogWrite( std::ofstream & fout, std::string testNumber, std::string result );
 void DirCrawl( std::string rootDir , std::string &logFile , std::string exec ,
-        int &passed , int &tested, const std::string &masterRootDir);
+        int &passed , int &tested, const std::string &masterRootDir, const std::string &studentName);
 void generateTst(std::string choice);
 void prompt();
 void sysProg(std::string test);
@@ -35,10 +35,10 @@ void cppDirCrawl( std::string curDir, std::vector< std::string > &cppFiles, cons
 void nameLogFiles( std::vector< std::string > &logNames, time_t timer,
                    std::vector< std::string > &studentNames);
 void nameExec( std::string &exec );
-bool critTest(std::string curDir, std::string logFile, std::string exec, 
-              std::string pass_fail);
+std::string critTest(std::string curDir, std::string logFile, std::string exec, 
+              std::string pass_fail, const std::string &studentName);
 
-bool runCritTst(std::string critTst , std::string exec, std::string logFile);
+bool runCritTst(std::string critTst , std::string exec, std::string logFile, const std::string &studentName);
 bool check_if_cpp_file(char name[]);
 void cleanUpGeneratedTests();
 void writeSummaryLog( std::string student_name, std::string result,
@@ -68,6 +68,7 @@ int main() /*int argc , char** argv  )*/
     std::vector< std::string > cppFiles;
     std::vector< std::string > studentNames;
     int i;
+    int exists;
 
     //Asks the user if they want tst files generated
     prompt();
@@ -86,33 +87,39 @@ int main() /*int argc , char** argv  )*/
 
     //Modifies strings to use student directory name in log file name.
     nameLogFiles( logNames, timer, studentNames );
-
     //compile the code
     //Passing the root directory of this program
     //and the .cpp or .C file to be tested
+    i=0;
     for( auto cppFile : cppFiles )
-        Compil(cppFile);
-
+    {
+        Compil(cppFile, studentNames[i]);
+        i++;
+    }
 
     //get directory to executable in string
     i = 0;
     for( auto exec : cppFiles )
     {
+        critAccepted = "PASSED";
         nameExec(exec);
-        exec = std::string(cCurrentPath)+ "/" + exec.substr(exec.find("./a.out"));
+
         if( critTest(std::string(cCurrentPath), logNames[i],
-                    exec, critAccepted ))
+                    exec, critAccepted, studentNames[i])!="FAILED")
         {
             //find and run test cases
             DirCrawl( std::string(cCurrentPath), logNames[i], 
-                      exec , passed , tested, std::string(cCurrentPath) );
+                    exec , passed , tested, std::string(cCurrentPath), studentNames[i] );
 
             //write final output to logfile
             percent = FinalLogWrite(logNames[i], passed, tested);
             writeSummaryLog(studentNames[i], percent,timer);
+            passed = 0;
+            tested = 0;
         }
         else
             writeSummaryLog(studentNames[i], "FAILED",timer);
+        i++;
     }
     return 0;
 }
@@ -138,7 +145,7 @@ int main() /*int argc , char** argv  )*/
  *
  *********************************************************************************/
 bool run_test_case( std::string test_file, std::string exec,
-        std::string &log_file, const std::string &rootDir)
+        std::string &log_file, const std::string &rootDir, const std::string& studentName)
 {
     std::string out_file = test_file;
     std::string ans_file = test_file;
@@ -149,7 +156,6 @@ bool run_test_case( std::string test_file, std::string exec,
     int result;
     int pos;
     int found;
-
     fout.open(log_file, std::ios::app | std::ios::out);
     found = test_file.find("Program_Tester_Generated_test");
 
@@ -161,7 +167,7 @@ bool run_test_case( std::string test_file, std::string exec,
     if(found != std::string::npos )
     {
         found = test_file.find_last_of( "t" );
-        ans_file = rootDir+"Program_Tester_Generated_test";
+        ans_file = rootDir+"/Program_Tester_Generated_test";
 
         for (i = found+1; test_file[i] != '.'; i++)
             ans_file+=test_file[i];
@@ -170,16 +176,14 @@ bool run_test_case( std::string test_file, std::string exec,
     }
     //get text for .out file and .ans file
     //remove tst
-    out_file.resize(out_file.size() - 3);
+    out_file.resize(out_file.size() - 4);
     //add out so we have case#.out
-    out_file += "out";
+    out_file += "_" +studentName + ".out";
 
     //remove tst
-    ans_file.resize(out_file.size() - 3);
+    ans_file.resize(ans_file.size() - 3);
     //add ans so we have case#.ans
     ans_file += "ans";
-    std::cout << "ANS: " + ans_file << std::endl;
-    std::cout << "OUT: " + out_file << std::endl;
 
     //command string = "executable < case.tst > case.out"
     //run the program with input from .tst and pipe output to .out
@@ -193,8 +197,8 @@ bool run_test_case( std::string test_file, std::string exec,
     // the --ignore ignores whitespace on each line, so trailing spaces
     // or newlines aren't flagged as incorrect
     // > pipes the output into a file called nul
-    command_string = "diff --ignore-all-space " + out_file + " " + ans_file + " > nul";
-    result = std::system(command_string.c_str());
+    command_string = "diff --ignore-all-space " + out_file + " " + ans_file;
+        result = std::system(command_string.c_str());
 
     //passed test
     if ( result == 0 )
@@ -222,12 +226,13 @@ bool run_test_case( std::string test_file, std::string exec,
  *
  * @returns none
  *********************************************************************************/
-void Compil( std::string progName )
+void Compil( std::string progName, std:: string studentName)
 {
     //creat the system command and execute it.
     std::string command;
-    command = "g++ " + progName;
+    command = "g++ " + progName + " -o " +studentName+ "_exec";
     system( command.c_str() );
+    std::cout << command + "\n\n";
 }
 
 /******************************************************************************//**
@@ -300,7 +305,7 @@ void LogWrite( std::ofstream & fout, std::string testNumber, std::string result 
  * @returns none
  *********************************************************************************/
 void DirCrawl( std::string rootDir, std::string &logFile , std::string exec,
-               int &passed, int &tested, const std::string &masterRootDir )
+               int &passed, int &tested, const std::string &masterRootDir, const std::string &studentName)
 {
     struct dirent** file;	// File entry structure from dirent.h
     std::string filename;	//used in finding if a file has the extention .tst
@@ -322,7 +327,7 @@ void DirCrawl( std::string rootDir, std::string &logFile , std::string exec,
         {
             //moves into the sub-directory
             DirCrawl( rootDir + "/" + filename , logFile , exec , passed , tested,
-                          masterRootDir);
+                          masterRootDir, studentName);
         }
         else if(filename.find("_crit.tst") == std::string::npos)
         {
@@ -332,7 +337,7 @@ void DirCrawl( std::string rootDir, std::string &logFile , std::string exec,
             {
                 // pass the file onto the grader 
                 if (run_test_case( rootDir + "/" + filename , exec , logFile,
-                                                masterRootDir) )
+                                                masterRootDir, studentName))
                 {
                     passed += 1;
                 }
@@ -400,26 +405,35 @@ void nameLogFiles( std::vector< std::string > &logNames, time_t timer,
 {
     std::string tmp = "";
     int i;
+    int j;
     //iteraties through the vector creating strings for all log files.
-    for(auto logName : logNames)
+    for(j = 0; j < logNames.size(); j++)
     {
         //iterates through a string removing everything after the last occurence of '/'
         //and stops when it is found
-        for( i = logName.length() - 1; logName[i] != '/'; i--)
-            logName.pop_back();
+        for( i = logNames[j].length() - 1; logNames[j][i] != '/'; i--)
+            logNames[j].pop_back();
         //moves the access pointer one spot to the last occurrence of '/'
         i--;
         //stores the student name in tmp up to the second to last '/'
-        while(logName[i] != '/')
+        while(logNames[j][i] != '/')
         {
-            tmp += logName[i];
+            tmp += logNames[j][i];
             i--;
         }
         std::reverse( tmp.begin(), tmp.end() );
         studentNames.push_back(tmp);
         //appends a .log to tmp and appends the file name to string
         tmp+="_" + std::string( ctime( &timer ) ) + ".log";
-        logName+=tmp;
+        for(int i = 14; i < tmp.length(); i++)
+        {
+            if(tmp[i]==' ')
+                tmp[i] = '_';
+            if(tmp[i] == '\n')
+                tmp.erase(tmp.begin()+i);
+
+        }
+        logNames[j]+=tmp;
         //sets tmp as an empty string for next string in vector that needs
         //to be modified
         tmp = "";
@@ -431,47 +445,46 @@ void nameExec( std::string &exec )
     int i;
     for( i = exec.length()-1;exec[i]!= '/'; i--)
         exec.pop_back();
-    exec+="./a.out";
+    exec.pop_back();
+    exec+="_exec";
 }
 
-bool critTest(std::string curDir, std::string logFile, std::string exec,
-              std::string pass_fail )
+std::string critTest(std::string curDir, std::string logFile, std::string exec,
+              std::string pass_fail, const std::string &studentName )
 {
     struct dirent **namelist; //structure in dirent.h stores the file name 
     //and the file id number
     int n;
-    static bool critResult = true;
     std::string tmp;
     int i;
     //scans the current directory for all 
     //types stores how many are found in n and the names in namelist
     n = scandir(curDir.c_str(), &namelist, 0, alphasort);
     if(n == -1)
-        return critResult;
+        return pass_fail;
     //starts at the second position since 
     //the first two files found are the . and .. directories
     for(i = 2; i<n; i++)
     {
         if(std::string(namelist[i] -> d_name).find("_crit.tst") != std::string::npos)
         {
-            if(runCritTst( std::string(namelist[i] -> d_name), exec, logFile))
+            if(runCritTst( curDir+"/"+ std::string(namelist[i] -> d_name), exec, logFile, studentName))
             {
-                    critResult = false;
                     pass_fail = "FAILED";
             }
         }
         else if( (int)namelist[i] -> d_type == 4 )
-            critResult = critTest(curDir + std::string(namelist[i] -> d_name)
-                                  + '/', logFile, exec, pass_fail);
+            pass_fail = critTest(curDir + "/" + std::string(namelist[i] -> d_name)
+                                  , logFile, exec, pass_fail, studentName);
     }
     for( i = 0; i < n; i++ )
         delete []namelist[i];
 
     delete []namelist;
-    return critResult;
+    return pass_fail;
 }
 
-bool runCritTst( std::string critTst, std::string exec, std::string logFile) 
+bool runCritTst( std::string critTst, std::string exec, std::string logFile, const std::string &studentName) 
 {
     std::string out_file = critTst;
     std::string ans_file = critTst;
@@ -482,12 +495,12 @@ bool runCritTst( std::string critTst, std::string exec, std::string logFile)
 
     //get text for .out file and .ans file
     //remove tst
-    out_file.resize(out_file.size() - 3);
+    out_file.resize(out_file.size() - 4);
     //add out so we have case#.out
-    out_file += "out";
+    out_file +="_" + studentName + ".out";
 
     //remove tst
-    ans_file.resize(out_file.size() - 3);
+    ans_file.resize(ans_file.size() - 3);
     //add ans so we have case#.ans
     ans_file += "ans";
 
@@ -496,6 +509,9 @@ bool runCritTst( std::string critTst, std::string exec, std::string logFile)
     command_string = exec + " < " + critTst + " > " + out_file;
     //execute the program
     std::system(command_string.c_str());
+    std::cout << logFile << std::endl;
+    std::cout << out_file << std::endl;
+    std::cout << ans_file << std::endl;
 
     //compare the programs output and the expected output( .out and .ans )
     // diff --ignore-all-space case.out case.ans > nul
@@ -503,8 +519,7 @@ bool runCritTst( std::string critTst, std::string exec, std::string logFile)
     // the --ignore ignores whitespace on each line, so trailing spaces
     // or newlines aren't flagged as incorrect
     // > pipes the output into a file called nul
-    command_string = "diff --ignore-all-space " + out_file + " " + ans_file 
-                                                           + " > nul";
+    command_string = "diff --ignore-all-space " + out_file + " " + ans_file;
     result = std::system(command_string.c_str());
     
     command_string = "rm " + out_file;
@@ -762,6 +777,8 @@ void writeSummaryLog( std::string student_name, std::string result,
     {
         if(summary_file_name[i]==' ')
             summary_file_name[i] = '_';
+        if(summary_file_name[i] == '\n')
+            summary_file_name.erase(summary_file_name.begin()+i);
     }
 
     fout.open( summary_file_name.c_str(), std::ios::app | std::ios::out );
