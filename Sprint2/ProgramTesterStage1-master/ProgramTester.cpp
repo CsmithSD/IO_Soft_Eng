@@ -121,6 +121,9 @@ int main() /*int argc , char** argv  )*/
             writeSummaryLog(studentNames[i], "FAILED",timer);
         i++;
     }
+
+    //cleanUpGeneratedTests();
+
     return 0;
 }
 
@@ -288,7 +291,8 @@ std::string FinalLogWrite( std::string &log_file, int numPassed, int numTest )
  *********************************************************************************/
 void LogWrite( std::ofstream & fout, std::string testNumber, std::string result )
 {
-    fout << testNumber << ": " << result.c_str() << std::endl;
+    fout << std::left << std::setw(50)<< testNumber << std::setw(20) <<
+            result.c_str() << std::endl << std::right;
 }
 
 /******************************************************************************//**
