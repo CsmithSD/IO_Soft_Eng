@@ -1,3 +1,30 @@
+/******************************************************************************
+*
+*
+* Program:Testing Suite
+* Author: Intolerable Optimists: Charles Parsons, Christopher Smith, Jarod Hogan
+* Class: Software Engineering
+* Instructor:   Dr. Logar
+* Date: 23 March 2014
+* Description:The program will first ask the user if they wish to generate test
+*             cases and if yes it will ask if int or float. After the prompts 
+*             are completed it then will crawl through the subdirectories, find 
+*             each program (.cpp file), compile, run tests in the tests 
+*             subdirectory, and create a log file for each student. The program 
+*             will create a summary file for all the programs run. At the end
+*             it will ask the user if they wish to delete all the files generated
+*             by this program and will remove them if y/Y. Else it will just exit.
+*
+* Input:
+* Output: This program runs other programs and outputs their failures 
+*         and passes to a log file and the overall results to a summary 
+*         file in the root directory that the program is ran from
+* Compilation instructions: There is a makefile associated with this program. 
+*                           All that is needed to compile is to use make.
+* Usage: ./ProgramTester
+* Known bugs/missing features: No known bugs           
+*******************************************************************************/
+
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -14,7 +41,9 @@
 #include <vector>
 #include <algorithm>
 
-
+/******************************************************************************
+ *                              GLOBAL CONSTANTS
+ * ***************************************************************************/
 const int MAX_LIST = 200;
 const int MAX_TEST = 100;
 
@@ -22,33 +51,58 @@ const int MAX_TEST = 100;
  *                               FUNCTION PROTOTYPES
  *********************************************************************************/
 bool run_test_case( std::string test_file, std::string exec,
-        std::string &log_file,const std::string &rootDir, const std::string &studentName);
+        std::string &log_file,const std::string &rootDir, 
+        const std::string &studentName);
+
 void Compil( std::string progName, std::string studentName);
+
 std::string FinalLogWrite( std::string &log_file, int numPassed, int numTest );
+
 void LogWrite( std::ofstream & fout, std::string testNumber, std::string result );
+
 void DirCrawl( std::string rootDir , std::string &logFile , std::string exec ,
-        int &passed , int &tested, const std::string &masterRootDir, const std::string &studentName);
+        int &passed , int &tested, const std::string &masterRootDir, 
+        const std::string &studentName);
+
 void generateTst(std::string choice);
+
 void prompt();
+
 void sysProg(std::string test);
-void cppDirCrawl( std::string curDir, std::vector< std::string > &cppFiles, const std::string &masterRootDir );
+
+void cppDirCrawl( std::string curDir, std::vector< std::string > &cppFiles, 
+        const std::string &masterRootDir );
+
 void nameLogFiles( std::vector< std::string > &logNames, time_t timer,
         std::vector< std::string > &studentNames);
+
 void nameExec( std::string &exec );
+
 std::string critTest(std::string curDir, std::string logFile, std::string exec, 
         std::string pass_fail, const std::string &studentName);
 
-bool runCritTst(std::string critTst , std::string exec, std::string logFile, const std::string &studentName);
+bool runCritTst(std::string critTst , std::string exec, std::string logFile, 
+        const std::string &studentName);
+
 bool check_if_cpp_file(char name[]);
+
 void cleanUpGeneratedTests();
+
 void writeSummaryLog( std::string student_name, std::string result,
         time_t timer );
+
 void critLogWrite( std::string log_file_name, bool passed_crit_tests, 
         std::string test_file_name );
 
 
 /******************************************************************************//**
+ * Function: int main()
+ * Author:Adventure Line, Christopher Smith, Charles Parsons
  *
+ * Description:This is the start of the program and is used to pass variables between
+ *             Functions and to call the prompting functions
+ *
+ * Parameters: None
  *
  *********************************************************************************/
 int main() /*int argc , char** argv  )*/
@@ -101,9 +155,10 @@ int main() /*int argc , char** argv  )*/
     i = 0;
     for( auto exec : cppFiles )
     {
+        //reset to passed for next executable file
         critAccepted = "PASSED";
         nameExec(exec);
-
+        //If a _crit.tst file fails then the else statement is executed instead of going into the normal .tst files
         if( critTest(std::string(cCurrentPath), logNames[i],
                     exec, critAccepted, studentNames[i])!="FAILED")
         {
@@ -111,24 +166,25 @@ int main() /*int argc , char** argv  )*/
             DirCrawl( std::string(cCurrentPath), logNames[i], 
                     exec , passed , tested, std::string(cCurrentPath), studentNames[i] );
 
-            //write final output to logfile
+            //write final output to logfile for current student
             percent = FinalLogWrite(logNames[i], passed, tested);
             writeSummaryLog(studentNames[i], percent,timer);
             passed = 0;
             tested = 0;
         }
+        //Writes FAILED to summarylog file if a _crit.tst fails
         else
             writeSummaryLog(studentNames[i], "FAILED",timer);
         i++;
     }
-
+    //prompts the user if they would like all files generated by this program to be removed
     cleanUpGeneratedTests();
 
     return 0;
 }
 
 /******************************************************************************//**
- * @author Andrew Koc
+ * @author Andrew Koc, Christopher Smith
  * 
  * @Description
  * This function takes two strings, one the directory to a test case file, and
@@ -141,7 +197,9 @@ int main() /*int argc , char** argv  )*/
  *
  * @param[in] - test_file the directory of the .tst file
  * @param[in] - exec the directory of the executable program to be tested
- * @param[out] - log_file the ofstream to the log file
+ * @param[out] - log_file is the name of the log file to be opened
+ * @param[in] - rootDir keeps track of the working directory
+ * @param[in] - studentName student name associated with executable
  *
  * @returns true - the program passed the test
  * @returns false - the program failed the test
