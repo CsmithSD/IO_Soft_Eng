@@ -96,11 +96,11 @@ int main() /*int argc , char** argv  )*/
 
     //get directory to executable in string
     i = 0;
-    std::cout <<"INSIDE FOR LOOP NOW!!!!!!!!!!" <<std::endl << std::endl;
     for( auto exec : cppFiles )
     {
         nameExec(exec);
-        if( critTest(std::string(cCurrentPath) + "/tests/", logNames[i],
+        exec = std::string(cCurrentPath)+ "/" + exec.substr(exec.find("./a.out"));
+        if( critTest(std::string(cCurrentPath), logNames[i],
                     exec, critAccepted ))
         {
             //find and run test cases
@@ -147,9 +147,16 @@ bool run_test_case( std::string test_file, std::string exec,
     std::ofstream fout;
     int i=0;
     int result;
+    int pos;
     int found;
+
     fout.open(log_file, std::ios::app | std::ios::out);
     found = test_file.find("Program_Tester_Generated_test");
+
+    pos = test_file.find_last_of("/");
+
+    test_num = test_file.substr( pos + 1 );
+    test_num.resize(test_num.size()-4);
 
     if(found != std::string::npos )
     {
@@ -171,6 +178,8 @@ bool run_test_case( std::string test_file, std::string exec,
     ans_file.resize(out_file.size() - 3);
     //add ans so we have case#.ans
     ans_file += "ans";
+    std::cout << "ANS: " + ans_file << std::endl;
+    std::cout << "OUT: " + out_file << std::endl;
 
     //command string = "executable < case.tst > case.out"
     //run the program with input from .tst and pipe output to .out
@@ -296,7 +305,6 @@ void DirCrawl( std::string rootDir, std::string &logFile , std::string exec,
     struct dirent** file;	// File entry structure from dirent.h
     std::string filename;	//used in finding if a file has the extention .tst
     int n;
-    std::cout << filename << std::endl;
     n =scandir(rootDir.c_str(), &file, 0, alphasort);
     if(n == -1)
         return;
@@ -313,7 +321,7 @@ void DirCrawl( std::string rootDir, std::string &logFile , std::string exec,
         if(filename != "." && filename != ".." &&  (int)file[i]->d_type == DT_DIR )
         {
             //moves into the sub-directory
-            DirCrawl( rootDir + filename + "/" , logFile , exec , passed , tested,
+            DirCrawl( rootDir + "/" + filename , logFile , exec , passed , tested,
                           masterRootDir);
         }
         else if(filename.find("_crit.tst") == std::string::npos)
@@ -322,9 +330,8 @@ void DirCrawl( std::string rootDir, std::string &logFile , std::string exec,
             // string::npos if the substring cannot be found
             if ( filename.find( ".tst") != std::string::npos )
             {
-                std::cout << "RUNNING TEST: "+filename+" \n \n \n ";
                 // pass the file onto the grader 
-                if (run_test_case( rootDir + filename , exec , logFile,
+                if (run_test_case( rootDir + "/" + filename , exec , logFile,
                                                 masterRootDir) )
                 {
                     passed += 1;
@@ -642,7 +649,7 @@ void prompt()
 
   do
   {
-    std::cout << "Would you like to generate test cases?(Y(y)/N(n)): ";
+    std::cout << "Would you like to generate test cases?( Y(y) / N(n) ): ";
     std::cin >> ans;
 
     ans = tolower(ans);
