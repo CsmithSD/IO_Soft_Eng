@@ -31,7 +31,7 @@ void DirCrawl( std::string rootDir , std::string &logFile , std::string exec ,
 void generateTst(std::string choice);
 void prompt();
 void sysProg(std::string test);
-void cppDirCrawl( std::string curDir, std::vector< std::string > &cppFiles );
+void cppDirCrawl( std::string curDir, std::vector< std::string > &cppFiles, const std::string &masterRootDir );
 void nameLogFiles( std::vector< std::string > &logNames, time_t timer,
                    std::vector< std::string > &studentNames);
 void nameExec( std::string &exec );
@@ -40,7 +40,6 @@ bool critTest(std::string curDir, std::string logFile, std::string exec,
 
 bool runCritTst(std::string critTst , std::string exec, std::string logFile);
 bool check_if_cpp_file(char name[]);
-bool check_if_tests_dir(char name[]);
 void cleanUpGeneratedTests();
 void writeSummaryLog( std::string student_name, std::string result,
                       time_t timer );
@@ -77,8 +76,8 @@ int main() /*int argc , char** argv  )*/
     getcwd(cCurrentPath , sizeof(cCurrentPath) );
 
     //finds all the cpp files below current directory
-    cppDirCrawl(std::string(cCurrentPath), cppFiles);
-
+    cppDirCrawl(std::string(cCurrentPath), cppFiles, std::string(cCurrentPath));
+    
     //creates a copy of the vector of strings holding the cpp files
     logNames = std::vector< std::string >(cppFiles);
 
@@ -97,6 +96,7 @@ int main() /*int argc , char** argv  )*/
 
     //get directory to executable in string
     i = 0;
+    std::cout <<"INSIDE FOR LOOP NOW!!!!!!!!!!" <<std::endl << std::endl;
     for( auto exec : cppFiles )
     {
         nameExec(exec);
@@ -104,7 +104,7 @@ int main() /*int argc , char** argv  )*/
                     exec, critAccepted ))
         {
             //find and run test cases
-            DirCrawl( std::string(cCurrentPath) + "/tests/", logNames[i], 
+            DirCrawl( std::string(cCurrentPath), logNames[i], 
                       exec , passed , tested, std::string(cCurrentPath) );
 
             //write final output to logfile
@@ -114,10 +114,6 @@ int main() /*int argc , char** argv  )*/
         else
             writeSummaryLog(studentNames[i], "FAILED",timer);
     }
-    //remove junk files
-    system("rm a.out");
-    system("rm nul");
-
     return 0;
 }
 
@@ -151,7 +147,7 @@ bool run_test_case( std::string test_file, std::string exec,
     std::ofstream fout;
     int i=0;
     int result;
-    unsigned int found;
+    int found;
     fout.open(log_file, std::ios::app | std::ios::out);
     found = test_file.find("Program_Tester_Generated_test");
 
@@ -297,51 +293,55 @@ void LogWrite( std::ofstream & fout, std::string testNumber, std::string result 
 void DirCrawl( std::string rootDir, std::string &logFile , std::string exec,
                int &passed, int &tested, const std::string &masterRootDir )
 {
-    DIR* dir = opendir( rootDir.c_str() );	// Open the directory
-    struct dirent* file;	// File entry structure from dirent.h
+    struct dirent** file;	// File entry structure from dirent.h
     std::string filename;	//used in finding if a file has the extention .tst
+    int n;
+    std::cout << filename << std::endl;
+    n =scandir(rootDir.c_str(), &file, 0, alphasort);
+    if(n == -1)
+        return;
 
     // Read each file one at a time
     // Readdir returns next file in the directory, returns null if no other files exist
-    while( ( file = readdir(dir)) != NULL )
+    for(int i = 2; i < n; i++)
     {
         //place file name into string filename for easier checking
-        filename = file->d_name;
+        filename = std::string(file[i]->d_name);
 
-        // skip over the directories "." and ".."
-        if ( filename != "." && filename != ".." )
+        // checks if the file is a subdirectory, 4 is the integer idetifyer
+        // for the dirent struct on Lixux systems
+        if(filename != "." && filename != ".." &&  (int)file[i]->d_type == DT_DIR )
         {
-            // checks if the file is a subdirectory, 4 is the integer idetifyer
-            // for the dirent struct on Lixux systems
-            if ( (int)file->d_type == 4 )
-            {
-                //moves into the sub-directory
-                DirCrawl( rootDir + filename + "/" , logFile , exec , passed , tested,
+            //moves into the sub-directory
+            DirCrawl( rootDir + filename + "/" , logFile , exec , passed , tested,
                           masterRootDir);
-            }
-            else if(filename.find("_crit.tst") == std::string::npos)
-            {
-                // checks if the file has a .tst in it. string find returns
-                // string::npos if the substring cannot be found
-                if ( filename.find( ".tst") != std::string::npos )
-                {
-                    // pass the file onto the grader 
-                    if (run_test_case( rootDir + '/' + filename , exec , logFile,
-                                                                masterRootDir) )
-                    {
-                        passed += 1;
-                    }
-                    tested += 1;
-                }
-            }
         }
+        else if(filename.find("_crit.tst") == std::string::npos)
+        {
+            // checks if the file has a .tst in it. string find returns
+            // string::npos if the substring cannot be found
+            if ( filename.find( ".tst") != std::string::npos )
+            {
+                std::cout << "RUNNING TEST: "+filename+" \n \n \n ";
+                // pass the file onto the grader 
+                if (run_test_case( rootDir + filename , exec , logFile,
+                                                masterRootDir) )
+                {
+                    passed += 1;
+                }
+                tested += 1;
+            }
+         }
     }
-    closedir(dir);
+    for( int i = 0; i < n; i++)
+        delete []file[i];
+    delete []file;
+
 }
 
 
 
-void cppDirCrawl( std::string curDir, std::vector< std::string > &cppFiles )
+void cppDirCrawl( std::string curDir, std::vector< std::string > &cppFiles, const std::string &masterRootDir)
 {
     struct dirent **namelist; //structure in dirent.h stores the file name 
     //and the file id number
@@ -358,21 +358,17 @@ void cppDirCrawl( std::string curDir, std::vector< std::string > &cppFiles )
     for(i=2; i<n; i++)
     {
         //checks if the file found is a .cpp file
-        if(check_if_cpp_file( namelist[i] -> d_name ))
+        if( curDir != masterRootDir && namelist[i]->d_type == DT_REG && check_if_cpp_file( namelist[i] -> d_name ))
         {
-            cppFiles.push_back( std::string( namelist[i] -> d_name ) );
+            cppFiles.push_back( curDir + std::string( namelist[i] -> d_name ) );
         }
         //Checks if the current spot is the tests directory and skips it
-        else if( check_if_tests_dir( namelist[i] -> d_name ) )
+        else if( namelist[i] -> d_type == DT_DIR)
         {
-            continue;
-        }
-        else
-        {
-            tmp = std::string(namelist[i] -> d_name);
-            cppDirCrawl(curDir + "/" + tmp, cppFiles);
-        }
 
+            tmp = std::string(namelist[i] -> d_name);
+            cppDirCrawl(curDir + "/" + tmp+"/", cppFiles, masterRootDir);
+        }
     }
     for( i = 0; i < n; i++)
         delete []namelist[i];
@@ -382,25 +378,14 @@ void cppDirCrawl( std::string curDir, std::vector< std::string > &cppFiles )
 bool check_if_cpp_file(char name[])
 {
     std::string tmp = std::string(name);
-    unsigned int found;
+    int found;
 
-    found = tmp.find(".cpp");
-
-    if(found == std::string::npos)
-        return false;
-    return true;
-}
-
-bool check_if_tests_dir(char name[])
-{
-    std::string tmp = std::string(name);
-    unsigned int found;
-
-    found = tmp.find("tests");
-
-    if(found == std::string::npos)
-        return false;
-    return true;
+    found = tmp.find(".cpp",tmp.length()-4);
+    if(found != std::string::npos)
+    {
+        return true;
+    }
+    return false;
 }
 
 void nameLogFiles( std::vector< std::string > &logNames, time_t timer, 
@@ -415,7 +400,6 @@ void nameLogFiles( std::vector< std::string > &logNames, time_t timer,
         //and stops when it is found
         for( i = logName.length() - 1; logName[i] != '/'; i--)
             logName.pop_back();
-
         //moves the access pointer one spot to the last occurrence of '/'
         i--;
         //stores the student name in tmp up to the second to last '/'
@@ -701,7 +685,7 @@ void critLogWrite( std::string log_file_name, bool passed_crit_tests,
                    std::string test_file_name )
 {
     std::ofstream fout;
-    unsigned int pos;
+    int pos;
     std::string temp_test_file_name = test_file_name;
 
     //parse test file name
@@ -766,6 +750,13 @@ void writeSummaryLog( std::string student_name, std::string result,
     std::string summary_file_name;
 
     summary_file_name = "class_summary_" + std::string(ctime(&timer)) + ".log";
+    
+    for(int i = 14; i < summary_file_name.length(); i++)
+    {
+        if(summary_file_name[i]==' ')
+            summary_file_name[i] = '_';
+    }
+
     fout.open( summary_file_name.c_str(), std::ios::app | std::ios::out );
 
     fout << std::setw( 50 ) << student_name << std::setw( 20 ) << result <<
