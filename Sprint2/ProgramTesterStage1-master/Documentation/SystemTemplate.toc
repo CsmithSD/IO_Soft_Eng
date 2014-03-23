@@ -1,0 +1,93 @@
+\contentsline {chapter}{Mission}{xiii}{chapter*.5}
+\contentsline {chapter}{Document Preparation and Updates}{xv}{chapter*.6}
+\contentsline {chapter}{\numberline {1}Overview and concept of operations}{1}{chapter.1}
+\contentsline {section}{\numberline {1.1}Scope}{1}{section.1.1}
+\contentsline {section}{\numberline {1.2}Purpose}{1}{section.1.2}
+\contentsline {section}{\numberline {1.3}Systems Goals}{1}{section.1.3}
+\contentsline {section}{\numberline {1.4}Technologies Overview}{1}{section.1.4}
+\contentsline {chapter}{\numberline {2}Project Overview}{3}{chapter.2}
+\contentsline {section}{\numberline {2.1}Team Members and Roles}{3}{section.2.1}
+\contentsline {section}{\numberline {2.2}Project Management Approach}{3}{section.2.2}
+\contentsline {section}{\numberline {2.3}Phase Overview}{3}{section.2.3}
+\contentsline {section}{\numberline {2.4}Terminology and Acronyms}{3}{section.2.4}
+\contentsline {chapter}{\numberline {3}User Stories, Backlog and Requirements}{5}{chapter.3}
+\contentsline {section}{\numberline {3.1}Overview}{5}{section.3.1}
+\contentsline {subsection}{\numberline {3.1.1}Scope}{5}{subsection.3.1.1}
+\contentsline {subsection}{\numberline {3.1.2}Purpose of the System}{5}{subsection.3.1.2}
+\contentsline {section}{\numberline {3.2} Stakeholder Information}{5}{section.3.2}
+\contentsline {subsection}{\numberline {3.2.1}Customer or End User (Product Owner)}{5}{subsection.3.2.1}
+\contentsline {subsection}{\numberline {3.2.2}Management or Instructor (Scrum Master)}{5}{subsection.3.2.2}
+\contentsline {subsection}{\numberline {3.2.3}Investors}{5}{subsection.3.2.3}
+\contentsline {subsection}{\numberline {3.2.4}Developers --Testers}{5}{subsection.3.2.4}
+\contentsline {section}{\numberline {3.3}Business Need}{6}{section.3.3}
+\contentsline {section}{\numberline {3.4}Requirements and Design Constraints}{6}{section.3.4}
+\contentsline {subsection}{\numberline {3.4.1}Development Environment Requirements}{6}{subsection.3.4.1}
+\contentsline {subsection}{\numberline {3.4.2}Project Management Methodology}{6}{subsection.3.4.2}
+\contentsline {section}{\numberline {3.5}User Stories}{6}{section.3.5}
+\contentsline {subsection}{\numberline {3.5.1}User Story \#1}{6}{subsection.3.5.1}
+\contentsline {subsection}{\numberline {3.5.2}User Story \#2}{6}{subsection.3.5.2}
+\contentsline {subsection}{\numberline {3.5.3}User Story \#3}{6}{subsection.3.5.3}
+\contentsline {subsection}{\numberline {3.5.4}User Story \#4}{6}{subsection.3.5.4}
+\contentsline {chapter}{\numberline {4}Design and Implementation}{7}{chapter.4}
+\contentsline {section}{\numberline {4.1}Locate and Compile .cpp File}{7}{section.4.1}
+\contentsline {subsection}{\numberline {4.1.1}Technologies Used}{7}{subsection.4.1.1}
+\contentsline {subsection}{\numberline {4.1.2}Data Flow Diagram}{7}{subsection.4.1.2}
+\contentsline {subsection}{\numberline {4.1.3}Design Details}{7}{subsection.4.1.3}
+\contentsline {section}{\numberline {4.2}Locate the Test Cases }{9}{section.4.2}
+\contentsline {subsection}{\numberline {4.2.1}Technologies Used}{9}{subsection.4.2.1}
+\contentsline {subsection}{\numberline {4.2.2}Component Overview}{9}{subsection.4.2.2}
+\contentsline {subsection}{\numberline {4.2.3}Data Flow Diagram}{9}{subsection.4.2.3}
+\contentsline {subsection}{\numberline {4.2.4}Design Details}{9}{subsection.4.2.4}
+\contentsline {section}{\numberline {4.3}Running a Test Case }{10}{section.4.3}
+\contentsline {subsection}{\numberline {4.3.1}Technologies Used}{10}{subsection.4.3.1}
+\contentsline {subsection}{\numberline {4.3.2}Component Overview}{10}{subsection.4.3.2}
+\contentsline {subsection}{\numberline {4.3.3}Data Flow Diagram}{11}{subsection.4.3.3}
+\contentsline {subsection}{\numberline {4.3.4}Design Details}{11}{subsection.4.3.4}
+\contentsline {section}{\numberline {4.4}Logging the Results}{12}{section.4.4}
+\contentsline {subsection}{\numberline {4.4.1}Technologies Used}{12}{subsection.4.4.1}
+\contentsline {subsection}{\numberline {4.4.2}Component Overview}{12}{subsection.4.4.2}
+\contentsline {subsection}{\numberline {4.4.3}Data Flow Diagram}{12}{subsection.4.4.3}
+\contentsline {subsection}{\numberline {4.4.4}Design Details}{12}{subsection.4.4.4}
+\contentsline {chapter}{\numberline {5}System and Unit Testing}{15}{chapter.5}
+\contentsline {section}{\numberline {5.1}Overview}{15}{section.5.1}
+\contentsline {section}{\numberline {5.2}Dependencies}{15}{section.5.2}
+\contentsline {section}{\numberline {5.3}Test Setup and Execution}{15}{section.5.3}
+\contentsline {chapter}{\numberline {6}Development Environment}{17}{chapter.6}
+\contentsline {section}{\numberline {6.1}Development IDE and Tools}{17}{section.6.1}
+\contentsline {section}{\numberline {6.2}Source Control}{17}{section.6.2}
+\contentsline {section}{\numberline {6.3}Dependencies}{17}{section.6.3}
+\contentsline {section}{\numberline {6.4}Build Environment}{17}{section.6.4}
+\contentsline {chapter}{\numberline {7}Release -- Setup -- Deployment}{19}{chapter.7}
+\contentsline {section}{\numberline {7.1}Deployment Information and Dependencies}{19}{section.7.1}
+\contentsline {section}{\numberline {7.2}Setup Information}{19}{section.7.2}
+\contentsline {section}{\numberline {7.3}System Versioning Information}{19}{section.7.3}
+\contentsline {chapter}{\numberline {8}User Documentation}{21}{chapter.8}
+\contentsline {section}{\numberline {8.1}User Guide}{21}{section.8.1}
+\contentsline {section}{\numberline {8.2}Installation Guide}{21}{section.8.2}
+\contentsline {section}{\numberline {8.3}Programmer Manual}{21}{section.8.3}
+\contentsline {chapter}{\numberline {9}Class Index}{23}{chapter.9}
+\contentsline {section}{\numberline {9.1}Class List}{23}{section.9.1}
+\contentsline {chapter}{\numberline {10}Class Documentation}{25}{chapter.10}
+\contentsline {section}{\numberline {10.1}Poly Class Reference}{25}{section.10.1}
+\contentsline {subsection}{\numberline {10.1.1}Constructor \& Destructor Documentation}{25}{subsection.10.1.1}
+\contentsline {subsubsection}{\numberline {10.1.1.a}Poly}{25}{subsubsection.10.1.1.1}
+\contentsline {subsubsection}{\numberline {10.1.1.b}$\sim $\discretionary {-}{}{}Poly}{25}{subsubsection.10.1.1.2}
+\contentsline {subsection}{\numberline {10.1.2}Member Function Documentation}{25}{subsection.10.1.2}
+\contentsline {subsubsection}{\numberline {10.1.2.a}myfunction}{25}{subsubsection.10.1.2.1}
+\contentsline {chapter}{Acknowledgement}{27}{chapter*.7}
+\contentsline {chapter}{Supporting Materials}{29}{chapter*.8}
+\contentsline {chapter}{Sprint Reports}{31}{chapter*.9}
+\contentsline {section}{\numberline {10.1}Sprint Report \#1}{31}{section.10.1}
+\contentsline {section}{\numberline {10.2}Sprint Report \#2}{31}{section.10.2}
+\contentsline {section}{\numberline {10.3}Sprint Report \#3}{31}{section.10.3}
+\contentsline {chapter}{Industrial Experience}{33}{chapter*.10}
+\contentsline {section}{\numberline {10.4}Resumes}{33}{section.10.4}
+\contentsline {section}{\numberline {10.5}Industrial Experience Reports}{33}{section.10.5}
+\contentsline {subsection}{\numberline {10.5.1}Name1}{33}{subsection.10.5.1}
+\contentsline {subsection}{\numberline {10.5.2}Name2}{33}{subsection.10.5.2}
+\contentsline {subsection}{\numberline {10.5.3}Name3}{33}{subsection.10.5.3}
+\contentsline {chapter}{Appendix}{35}{chapter*.11}
+\contentsline {section}{\numberline {10.1}Introduction}{35}{section.10.1}
+\contentsline {section}{\numberline {10.2}Ordinary Text}{35}{section.10.2}
+\contentsline {section}{\numberline {10.3}Displayed Text}{36}{section.10.3}
+\contentsline {section}{\numberline {10.4}Build process}{36}{section.10.4}
