@@ -546,6 +546,8 @@ bool runCritTst( std::string critTst, std::string exec, std::string logFile)
  *********************************************************************************/
 void generateTst(std::string choice)
 {
+  
+  //variables
   std::ofstream fout;
   int randNum,i,j;
   double randNum2;
@@ -560,13 +562,16 @@ void generateTst(std::string choice)
   srand(time(NULL));  
   max1 = rand() % MAX_TEST + 1;
 
+  //Generates list of numbers (ints or floats) 
   for(j = 0; j < max1; j++)
   {
+    //names test file   
     temp = j;
     convert << temp;
     num = convert.str();
     convert.str("");
     filename = filePath + name + num + ext;
+
     fout.open(filename.c_str());
     if(!fout)
     {
@@ -609,7 +614,7 @@ void generateTst(std::string choice)
 
     fout.close();
   
- 
+    //runs golden.cpp with test file just generated
     sysProg(filename);
   }//end for loop
 }
@@ -628,14 +633,18 @@ void generateTst(std::string choice)
  *********************************************************************************/
 void sysProg(std::string test)
 {
+  
+  //creates strings to compile golden.cpp and run it with test cases
   std::string compile = "g++ -o test golden.cpp ";
   std::string run = "./test";
   std::string answer = test.substr(8, test.size());
   answer = answer.substr(0, answer.size()-3) + "ans";
 
+  //Compiles golden.cpp
   system(compile.c_str());
-  run = run + " < " + test + " > " + answer;
 
+  //runs golden.cpp with redirected output
+  run = run + " < " + test + " > " + answer;
   system(run.c_str());
  
 }
@@ -652,17 +661,21 @@ void sysProg(std::string test)
  *********************************************************************************/
 void prompt()
 {
-  char ans;
-  std::string choice;
-  bool flag = false;
+  //variables
+  char ans; //stores users answer
+  std::string choice;//stores users choice of int or float
+  bool flag = false;//flag for loop
 
 
   do
   {
+    //Prompt user test cases
     std::cout << "Would you like to generate test cases?(Y(y)/N(n)): ";
     std::cin >> ans;
 
     ans = tolower(ans);
+   
+    //Evaluates the users choice of int or float
     switch(ans)
     { 
       case 'y':
