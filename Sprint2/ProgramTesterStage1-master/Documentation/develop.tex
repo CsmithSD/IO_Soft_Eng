@@ -20,7 +20,7 @@ on a Linux system.
 \section{Build  Environment}
 The execuatble is built by the g++ compiler.  You can either compile it manually, using the command:
 \begin{lstlisting}
-g++ -o tester ProgramTester.cpp
+g++ -c -std=c++11 -o ProgramTester ProgramTester.cpp
 \end{lstlisting}
 Or by using the following make file:
 
@@ -29,7 +29,7 @@ Or by using the following make file:
 CC = g++
 
 # compiler options
-CFLAGS = -c -Wall
+CFLAGS = -c -std=c++11
 
 all: tester
 
@@ -40,6 +40,6 @@ tester.o: ProgramTester.cpp
 	$(CC) $(CFLAGS) ProgramTester.cpp
 
 clean:
-	rm -rf *o tester
+	rm -rf *o ProgramTester
 \end{lstlisting}
 
