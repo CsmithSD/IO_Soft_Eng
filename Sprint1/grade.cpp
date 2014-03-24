@@ -58,6 +58,7 @@ int main( int argc, char* argv[] )
     string tmp;
     double passes_percent;
     double fails_percent;
+    time_t timer;
 
 
 
@@ -71,6 +72,16 @@ int main( int argc, char* argv[] )
     fileName = argv[1];
     pos = fileName.find_last_of( "." );
     fileName = fileName.substr( 0, pos );
+
+    time( &timer);
+    fileName += std::string(ctime(&timer));
+    for(int i = 0; i < fileName.length(); i++)
+    {
+        if(fileName[i]==' ')
+            fileName[i] = '_';
+        if(fileName[i] == '\n')
+            fileName.erase(fileName.begin()+i);
+    }
 
     tmp =fileName + ".log";
 
