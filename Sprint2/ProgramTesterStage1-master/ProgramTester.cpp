@@ -565,6 +565,21 @@ void nameExec( std::string &exec )
     exec+="_exec";
 }
 
+/*****************************************************************************
+ * @author Chris Smith
+ *
+ * @description This function finds the crit tests. When they are found it calls
+ *              run crit test. It then searches for the next crit test and
+ *              repeats.
+ *              
+ *
+ * @param[in] curDir - the path to the current directory
+ * @param[in] logFile - the log file name
+ * @param[in] exec - name of the executable to be run against the crit test
+ * @param[in] pass_fail - a string holding "PASSED" or "FAILED"
+ * @param[in] studentName - the student's name
+ *
+ * ***************************************************************************/
 std::string critTest(std::string curDir, std::string logFile, std::string exec,
         std::string pass_fail, const std::string &studentName )
 {
@@ -573,18 +588,23 @@ std::string critTest(std::string curDir, std::string logFile, std::string exec,
     int n;
     std::string tmp;
     int i;
+
     //scans the current directory for all 
     //types stores how many are found in n and the names in namelist
     n = scandir(curDir.c_str(), &namelist, 0, alphasort);
+
     if(n == -1)
         return pass_fail;
+
     //starts at the second position since 
     //the first two files found are the . and .. directories
     for(i = 2; i<n; i++)
     {
-        if(std::string(namelist[i] -> d_name).find("_crit.tst") != std::string::npos)
+        if(std::string(namelist[i] -> d_name).find("_crit.tst")
+                       != std::string::npos)
         {
-            if(runCritTst( curDir+"/"+ std::string(namelist[i] -> d_name), exec, logFile, studentName))
+            if(runCritTst( curDir+"/"+ std::string(namelist[i] -> d_name), exec,
+                           logFile, studentName))
             {
                 pass_fail = "FAILED";
             }
@@ -600,6 +620,23 @@ std::string critTest(std::string curDir, std::string logFile, std::string exec,
     return pass_fail;
 }
 
+/*****************************************************************************
+ * @author: Chris Smith
+ *
+ * @description This function will builds the names for the .out and .ans files
+ *              based on the crit test file name provided. It then runs the
+ *              executable against the crit test. The output from that is sent
+ *              to the .out file which is compared with the .ans file using
+ *              the diff command. If they are the same then it is passed, 
+ *              otherwise it failed.
+ *              
+ *
+ * @param[in] critTst - name of the critical test file
+ * @param[in] exec - name of the executable to be run against the crit test
+ * @param[in] logFile - the log file name
+ * @param[in] studentName - the student's name
+ *
+ * ***************************************************************************/
 bool runCritTst( std::string critTst, std::string exec, std::string logFile, const std::string &studentName) 
 {
     std::string out_file = critTst;
@@ -820,15 +857,15 @@ void prompt()
 
 
 /*****************************************************************************
- * @Author: Charles Parsons
+ * @author: Charles Parsons
  *
- * @Description Writes to the student log file for the results of the critical
+ * @description Writes to the student log file for the results of the critical
  *              tests.
  *
- * @Param[in] log_file_name - the name of the log file to be written
- * @Param[in] passed_crit_tests - true if crit test was passed and false if it
+ * @param[in] log_file_name - the name of the log file to be written
+ * @param[in] passed_crit_tests - true if crit test was passed and false if it
  *                                was failed
- * @Param[in] test_file_name - the path, including name, to the test file that
+ * @param[in] test_file_name - the path, including name, to the test file that
  *                             was run
  *
  * ***************************************************************************/
@@ -880,16 +917,16 @@ void critLogWrite( std::string log_file_name, bool passed_crit_tests,
 }
 
 /*****************************************************************************
- * @Author: Charles Parsons
+ * @author: Charles Parsons
  *
- * @Description: Writes a line to the class summary log file. This is an
+ * @description: Writes a line to the class summary log file. This is an
  *              entry for a single student.
  *
- * @Param[in] student_name - the name of the student
- * @Param[in] result - a string with either "FAILED" if they failed one or more
+ * @param[in] student_name - the name of the student
+ * @param[in] result - a string with either "FAILED" if they failed one or more
  *                     critical tests or a percentage representing the tests
  *                     the student passed
- * @Param[in] root_directory - a string with the root directory
+ * @param[in] root_directory - a string with the root directory
  *
  *
  ****************************************************************************/
@@ -900,18 +937,24 @@ void writeSummaryLog( std::string student_name, std::string result,
     std::ofstream fout;
     std::string summary_file_name;
 
+    //build the summary log file name
     summary_file_name = "class_summary_" + std::string(ctime(&timer)) + ".log";
 
+    //in the summary log file name replace spaces with underscores
     for(int i = 14; i < summary_file_name.length(); i++)
     {
+        if(summary_file_name[i] == ':')
+            summary_file_name[i] = '.';
         if(summary_file_name[i]==' ')
             summary_file_name[i] = '_';
         if(summary_file_name[i] == '\n')
             summary_file_name.erase(summary_file_name.begin()+i);
     }
 
+    //open the summary log file for appending
     fout.open( summary_file_name.c_str(), std::ios::app | std::ios::out );
 
+    //write entry to log file
     fout << std::left << std::setw( 50 ) << student_name << std::setw( 20 )
         << result << std::endl << std::right;
 
@@ -919,22 +962,32 @@ void writeSummaryLog( std::string student_name, std::string result,
 }
 
 /******************************************************************************
- * @Author: Charles Parsons
+ * @author: Charles Parsons
  *
- * @Description: Removes all generated test and answer files
+ * @description: Removes all generated test and answer files
  *
  * ***************************************************************************/
 void cleanUpGeneratedTests()
 {
     std::string command_string;
     char choice;
+
+    //remove nul file that held diff command results
     system( "rm -rf nul" );
 
-    std::cout << "Would you like program generated tst, ans, and out files, for generated tests, removed? (Y/N): ";
+    //prompt for removal of generated tst, ans, and out files for those
+    //generated tests
+    std::cout << "Would you like program generated tst, ans, and out files," << 
+                 " for generated tests, removed? (Y/N): ";
+
+    //read in the user's choice
     std::cin >> choice;
 
+    //check if the choice was Y/y. if not, then return. if it was, then
+    //continue
     if(choice != 'y' && choice != 'Y')
         return;
+
     //the command string for removing all of our generated test cases and
     //their answer files
     command_string = "rm -rf Program_Tester_Generated*";
@@ -942,6 +995,7 @@ void cleanUpGeneratedTests()
     //use the command string
     system( command_string.c_str() );
     system( "rm -rf tests/Program_Tester*" );
+
     std::cerr << "This house is clean." << std::endl;
 
 }
