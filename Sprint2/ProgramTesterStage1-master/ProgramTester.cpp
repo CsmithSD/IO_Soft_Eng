@@ -762,15 +762,15 @@ void prompt()
 
 
 /*****************************************************************************
- * @Author: Charles Parsons
+ * @author: Charles Parsons
  *
- * @Description Writes to the student log file for the results of the critical
+ * @description Writes to the student log file for the results of the critical
  *              tests.
  *
- * @Param[in] log_file_name - the name of the log file to be written
- * @Param[in] passed_crit_tests - true if crit test was passed and false if it
+ * @param[in] log_file_name - the name of the log file to be written
+ * @param[in] passed_crit_tests - true if crit test was passed and false if it
  *                                was failed
- * @Param[in] test_file_name - the path, including name, to the test file that
+ * @param[in] test_file_name - the path, including name, to the test file that
  *                             was run
  *
  * ***************************************************************************/
@@ -822,16 +822,16 @@ void critLogWrite( std::string log_file_name, bool passed_crit_tests,
 }
 
 /*****************************************************************************
- * @Author: Charles Parsons
+ * @author: Charles Parsons
  *
- * @Description: Writes a line to the class summary log file. This is an
+ * @description: Writes a line to the class summary log file. This is an
  *              entry for a single student.
  *
- * @Param[in] student_name - the name of the student
- * @Param[in] result - a string with either "FAILED" if they failed one or more
+ * @param[in] student_name - the name of the student
+ * @param[in] result - a string with either "FAILED" if they failed one or more
  *                     critical tests or a percentage representing the tests
  *                     the student passed
- * @Param[in] root_directory - a string with the root directory
+ * @param[in] root_directory - a string with the root directory
  *
  *
  ****************************************************************************/
@@ -842,8 +842,10 @@ void writeSummaryLog( std::string student_name, std::string result,
     std::ofstream fout;
     std::string summary_file_name;
 
+    //build the summary log file name
     summary_file_name = "class_summary_" + std::string(ctime(&timer)) + ".log";
 
+    //in the summary log file name replace spaces with underscores
     for(int i = 14; i < summary_file_name.length(); i++)
     {
         if(summary_file_name[i]==' ')
@@ -852,8 +854,10 @@ void writeSummaryLog( std::string student_name, std::string result,
             summary_file_name.erase(summary_file_name.begin()+i);
     }
 
+    //open the summary log file for appending
     fout.open( summary_file_name.c_str(), std::ios::app | std::ios::out );
 
+    //write entry to log file
     fout << std::left << std::setw( 50 ) << student_name << std::setw( 20 )
         << result << std::endl << std::right;
 
@@ -861,22 +865,32 @@ void writeSummaryLog( std::string student_name, std::string result,
 }
 
 /******************************************************************************
- * @Author: Charles Parsons
+ * @author: Charles Parsons
  *
- * @Description: Removes all generated test and answer files
+ * @description: Removes all generated test and answer files
  *
  * ***************************************************************************/
 void cleanUpGeneratedTests()
 {
     std::string command_string;
     char choice;
+
+    //remove nul file that held diff command results
     system( "rm -rf nul" );
 
-    std::cout << "Would you like program generated tst, ans, and out files, for generated tests, removed? (Y/N): ";
+    //prompt for removal of generated tst, ans, and out files for those
+    //generated tests
+    std::cout << "Would you like program generated tst, ans, and out files," << 
+                 " for generated tests, removed? (Y/N): ";
+
+    //read in the user's choice
     std::cin >> choice;
 
+    //check if the choice was Y/y. if not, then return. if it was, then
+    //continue
     if(choice != 'y' && choice != 'Y')
         return;
+
     //the command string for removing all of our generated test cases and
     //their answer files
     command_string = "rm -rf Program_Tester_Generated*";
@@ -884,6 +898,7 @@ void cleanUpGeneratedTests()
     //use the command string
     system( command_string.c_str() );
     system( "rm -rf tests/Program_Tester*" );
+
     std::cerr << "This house is clean." << std::endl;
 
 }
