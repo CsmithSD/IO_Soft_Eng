@@ -1,0 +1,14 @@
+case_0.tst 16  16 pass
+case_1.tst 4  4 pass
+case_2.tst 60  60 pass
+case_3.tst 1.66667  1.66667 pass
+case_4.tst 31  31 pass
+case_5.tst Invalid operator   Invalid operator  pass
+case_6.tst Divide by zero error  Divide by zero error pass
+case_7.tst 16  16 pass
+case_8.tst 1.66667  1.66667 pass
+case_9.tst 60  60 pass
+total number of passes: 10
+total number of fails: 0
+percentage of passes: 100%
+percentage of fails: 0%

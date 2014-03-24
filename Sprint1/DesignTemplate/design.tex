@@ -1,0 +1,133 @@
+% !TEX root = SystemTemplate.tex
+\chapter{Design  and Implementation}
+Below is discussed the major components of the test suite. There are only two major components in the testing suite so far. The first is the Directory traversing and the second is test generating and evaluation.
+
+\begin{algorithm} [tbh]              %enter algorithm environment
+\caption{Overall Algorithm}
+\label{algover}
+\begin{algorithmic}
+	\STATE Compile .cpp file
+	\STATE Locate .tst and .ans files
+	\WHILE{Locate .tst and .ans files}
+		\STATE Run .tst file
+		\IF{.tst File passes}
+			\STATE $K \Leftarrow K + 1$
+		\ENDIF
+		\STATE $D \Leftarrow D + 1$
+	\ENDWHILE
+	\STATE $Percentage Passed \Leftarrow $K / D
+\end{algorithmic}
+\end{algorithm}
+
+
+\section{Major Component \#1 }
+As mentioned above the first major component is the directory traverse algorithm. This is the heart of the testing suite as well as where all the real power lies. It is here where we talk a strole through the directory and each subdirectory to search for every students .cpp program to compile and run it.
+
+\subsection{Technologies  Used}
+The majortechnologies used were the Fujitsu tablets running on the Linux OS. We also used gedit and vim as our text editors.
+
+\subsection{Component  Overview}
+The system traversies the subdirectories seeking a C++ program to run and compile as well as test files for evaluation.
+
+\subsection{Phase Overview}
+This phase searches for *.cpp files to compile and run.
+
+\subsection{ Architecture  Diagram}
+Compile a *.cpp file passed as a command line argument. Run that executable against all *.tst files within the current directory and all of its sub-directories.
+
+\subsection{Data Flow Diagram}
+Input is redirected from the *.tst file and output is redirected to a *.out file. The *.out file is compared to the corresponding *.ans file. The results are printed in a *.log file.
+
+\subsection{Design Details}
+This is where the details are presented and may contain subsections.   Here is an example code listing:
+\begin{lstlisting}
+#include <stdio.h>
+#define N 10
+/* Block
+ * comment */
+ 
+void findTestFile(string file, const string &program, int &pass, int &fail, ofstream &fout)
+{
+    ifstream fin;
+    struct dirent **namelist; //structure in dirent.h stores the file name 
+                              //and the file id number
+    int n;
+    string ans_file;
+    string log_line;
+    string tmp;
+    string actual_out;
+    int i;
+    //scans teh current directory for all 
+    //types stores how many are found in n and the names in namelist
+    n = scandir(file.c_str(), &namelist, 0, alphasort);
+    if(n == -1)
+        return;
+    //starts at the second position since 
+    //the first to files found are the . and .. directories
+    for(i=2; i<n; i++)
+    {
+        //checks if the file found is a .tst
+        if(check_if_file( namelist[i] -> d_name ))
+        {
+
+            tmp = string(namelist[i]->d_name);
+            ans_file = tmp.substr(0,tmp.find_last_of('.') ) + ".out";
+
+            if(test(program, file,ans_file,tmp,log_line))
+            {
+                log_file(fout, log_line,"pass");
+                pass++;
+            }
+            else
+            {
+                log_file(fout, log_line, "fail");
+                fail++;
+            }
+            
+        }
+        //if the file is not a .tst but is a .ans  
+        //or . .. it skips those files
+        else if(check_if_dot(namelist[i] -> d_name ))
+        {
+            continue;
+        }
+        //goes into this else if the file is a directory
+        else
+        {
+            tmp = string(namelist[i] -> d_name);
+            findTestFile(file + "/" + tmp, program, pass, fail, fout);
+        }
+    }
+    for(i = 0; i < n; i++)
+        delete []namelist[i];
+    delete []namelist;
+}
+\end{lstlisting}
+This code listing is not floating or automatically numbered.  If you want autonumbering, but it in the algorithm environment (not algorithmic however) shown above.
+
+
+
+\section{Major Component \#2 }
+The second component of the system is the test generation and evaluation. 
+
+\subsection{Technologies  Used}
+The majortechnologies used were the Fujitsu tablets running on the Linux OS. We also used gedit and vim as our text editors.
+
+\subsection{Component  Overview}
+The system traversies the subdirectories seeking a C++ program to run and compile as well as test files for evaluation.
+
+\subsection{Phase Overview}
+This phase searches for *.cpp files to compile and run.
+
+\subsection{ Architecture  Diagram}
+It is important to build and maintain an architecture diagram.  However, it may 
+be that a component is best described visually with a data flow diagram. 
+
+
+\subsection{ Architecture  Diagram}
+Compile a *.cpp file passed as a command line argument. Run that executable against all *.tst files within the current directory and all of its sub-directories.
+
+\subsection{Data Flow Diagram}
+Input is redirected from the *.tst file and output is redirected to a *.out file. The *.out file is compared to the corresponding *.ans file. The results are printed in a *.log file.
+
+
