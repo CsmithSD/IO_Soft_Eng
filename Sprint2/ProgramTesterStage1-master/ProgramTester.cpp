@@ -218,13 +218,17 @@ bool run_test_case( std::string test_file, std::string exec,
     int pos;
     int found;
     fout.open(log_file, std::ios::app | std::ios::out);
+
+    //Used to find Generated test files
     found = test_file.find("Program_Tester_Generated_test");
 
     pos = test_file.find_last_of("/");
 
+    //Creates the string to be outputted to log file detailing what tst file it is    
     test_num = test_file.substr( pos + 1 );
     test_num.resize(test_num.size()-4);
 
+    //If the test is a program generated one it appends the correct path to it on the string
     if(found != std::string::npos )
     {
         found = test_file.find( "test" );
@@ -279,8 +283,9 @@ bool run_test_case( std::string test_file, std::string exec,
  * in the form of a .cpp file, with g++ to default compiled program
  * a.out.
  * 
- * @pram[in] progName - The name of the .cpp file for the source code.
+ * @pram[in] - progName The name of the .cpp file for the source code.
  *                      (should include .cpp at the end.)
+ * @param[in] - studentName used to make the executable a unique file name 
  *
  * @returns none
  *********************************************************************************/
@@ -338,7 +343,7 @@ std::string FinalLogWrite( std::string &log_file, int numPassed, int numTest )
  * to the given file stream. 
  *
  *@param[in] fout - the output stream to write to.
- *@param[in] testNumber - the number of the test case, i.e. test #1, test #2, etc.
+ *@param[in] testNumber - the number of the test case, i.e. test1, test2, etc.
  *@param[in] status - The result of the test, passed or fail
  *
  *@returns none
@@ -360,6 +365,11 @@ void LogWrite( std::ofstream & fout, std::string testNumber, std::string result 
  * @param[in] rootDir
  * @param[in,out] logFile - a filestream to the logFile so that is passed on
  * to the tester functions
+ * @param[in] exec - the executable to be run
+ * @param[in,out] passed - is the number of tsts that passed
+ * @param[in,out] tested - total number of tsts that were run
+ * @param[in,out] masterRootDir - keeps track of the root dir the program is running from
+ * @param[in,out] studentName - Used to make the out files have unique names
  * @returns none
  *********************************************************************************/
 void DirCrawl( std::string rootDir, std::string &logFile , std::string exec,
@@ -409,8 +419,18 @@ void DirCrawl( std::string rootDir, std::string &logFile , std::string exec,
 
 }
 
-
-
+/******************************************************************************//**
+ * @author Christopher Smith
+ *
+ * @Description
+ * A recursive file traversal that gets a root directory and traverses through
+ * all sub-directories looking for cpp files and stores them into cppFiles.
+ * 
+ * @param[in] curDir - Current directory that is being searched for cpp files
+ * @param[in,out] cppFiles - Stores the cpp files that will be compiled later
+ * @param[in] masterRootDir - is used that the golden.cpp is not counted among cppfiles
+ * @returns none
+ *********************************************************************************/
 void cppDirCrawl( std::string curDir, std::vector< std::string > &cppFiles, const std::string &masterRootDir)
 {
     struct dirent **namelist; //structure in dirent.h stores the file name 
@@ -427,7 +447,7 @@ void cppDirCrawl( std::string curDir, std::vector< std::string > &cppFiles, cons
     //the first two files found are the . and .. directories
     for(i=2; i<n; i++)
     {
-        //checks if the file found is a .cpp file
+        //checks if the file found is a .cpp file and is not in the root dir that the program is being run from
         if( curDir != masterRootDir && namelist[i]->d_type == DT_REG && check_if_cpp_file( namelist[i] -> d_name ))
         {
             cppFiles.push_back( curDir + std::string( namelist[i] -> d_name ) );
@@ -440,11 +460,21 @@ void cppDirCrawl( std::string curDir, std::vector< std::string > &cppFiles, cons
             cppDirCrawl(curDir + "/" + tmp+"/", cppFiles, masterRootDir);
         }
     }
+
     for( i = 0; i < n; i++)
         delete []namelist[i];
     delete []namelist;
 }
 
+/******************************************************************************//**
+ * @author Christopher Smith
+ *
+ * @Description
+ * Checks if the file has a .cpp attached to it
+ * 
+ * @param[in] name[] - stores the file name
+ * @returns none
+ *********************************************************************************/
 bool check_if_cpp_file(char name[])
 {
     std::string tmp = std::string(name);
@@ -458,6 +488,19 @@ bool check_if_cpp_file(char name[])
     return false;
 }
 
+/******************************************************************************//**
+ * @author Christopher Smith
+ *
+ * @Description
+ * This function will rename the current coppies of the cpp file strings with a .log
+ * extension, aswell as being time stamped. It will also copy the student names into
+ * studentNames for future use.
+ * 
+ * @param[in,out] logNames - vector of strings to be modified
+ * @param[in] timer - Time that will be time stamped onto the log file name
+ * @param[in,out] studentNames - Gets the names of the students added to it in this function
+ * @returns none
+ *********************************************************************************/
 void nameLogFiles( std::vector< std::string > &logNames, time_t timer, 
         std::vector < std::string > &studentNames )
 {
@@ -479,14 +522,20 @@ void nameLogFiles( std::vector< std::string > &logNames, time_t timer,
             tmp += logNames[j][i];
             i--;
         }
+        //reverses the string since it is stored backwards
         std::reverse( tmp.begin(), tmp.end() );
         studentNames.push_back(tmp);
         //appends a .log to tmp and appends the file name to string
         tmp+="_" + std::string( ctime( &timer ) ) + ".log";
         for(int i = 14; i < tmp.length(); i++)
         {
+            //removes spaces replacing them with '_'
+            //and removes colons replacing them with '.'
+            //and removes endlines in the string
             if(tmp[i]==' ')
                 tmp[i] = '_';
+            if(tmp[i]== ':')
+                tmp[i] = '.';
             if(tmp[i] == '\n')
                 tmp.erase(tmp.begin()+i);
 
@@ -498,6 +547,15 @@ void nameLogFiles( std::vector< std::string > &logNames, time_t timer,
     }
 }
 
+/******************************************************************************//**
+ * @author Christopher Smith
+ *
+ * @Description
+ * Renames the executable file to be "student_name_exec"
+ * 
+ * @param[in,out] exec - File execuatable name to be modified
+ * @returns none
+ *********************************************************************************/
 void nameExec( std::string &exec )
 {
     int i;
@@ -507,6 +565,21 @@ void nameExec( std::string &exec )
     exec+="_exec";
 }
 
+/*****************************************************************************
+ * @author Chris Smith
+ *
+ * @description This function finds the crit tests. When they are found it calls
+ *              run crit test. It then searches for the next crit test and
+ *              repeats.
+ *              
+ *
+ * @param[in] curDir - the path to the current directory
+ * @param[in] logFile - the log file name
+ * @param[in] exec - name of the executable to be run against the crit test
+ * @param[in] pass_fail - a string holding "PASSED" or "FAILED"
+ * @param[in] studentName - the student's name
+ *
+ * ***************************************************************************/
 std::string critTest(std::string curDir, std::string logFile, std::string exec,
         std::string pass_fail, const std::string &studentName )
 {
@@ -515,18 +588,23 @@ std::string critTest(std::string curDir, std::string logFile, std::string exec,
     int n;
     std::string tmp;
     int i;
+
     //scans the current directory for all 
     //types stores how many are found in n and the names in namelist
     n = scandir(curDir.c_str(), &namelist, 0, alphasort);
+
     if(n == -1)
         return pass_fail;
+
     //starts at the second position since 
     //the first two files found are the . and .. directories
     for(i = 2; i<n; i++)
     {
-        if(std::string(namelist[i] -> d_name).find("_crit.tst") != std::string::npos)
+        if(std::string(namelist[i] -> d_name).find("_crit.tst")
+                       != std::string::npos)
         {
-            if(runCritTst( curDir+"/"+ std::string(namelist[i] -> d_name), exec, logFile, studentName))
+            if(runCritTst( curDir+"/"+ std::string(namelist[i] -> d_name), exec,
+                           logFile, studentName))
             {
                 pass_fail = "FAILED";
             }
@@ -542,6 +620,23 @@ std::string critTest(std::string curDir, std::string logFile, std::string exec,
     return pass_fail;
 }
 
+/*****************************************************************************
+ * @author: Chris Smith
+ *
+ * @description This function will builds the names for the .out and .ans files
+ *              based on the crit test file name provided. It then runs the
+ *              executable against the crit test. The output from that is sent
+ *              to the .out file which is compared with the .ans file using
+ *              the diff command. If they are the same then it is passed, 
+ *              otherwise it failed.
+ *              
+ *
+ * @param[in] critTst - name of the critical test file
+ * @param[in] exec - name of the executable to be run against the crit test
+ * @param[in] logFile - the log file name
+ * @param[in] studentName - the student's name
+ *
+ * ***************************************************************************/
 bool runCritTst( std::string critTst, std::string exec, std::string logFile, const std::string &studentName) 
 {
     std::string out_file = critTst;
@@ -848,6 +943,8 @@ void writeSummaryLog( std::string student_name, std::string result,
     //in the summary log file name replace spaces with underscores
     for(int i = 14; i < summary_file_name.length(); i++)
     {
+        if(summary_file_name[i] == ':')
+            summary_file_name[i] = '.';
         if(summary_file_name[i]==' ')
             summary_file_name[i] = '_';
         if(summary_file_name[i] == '\n')
