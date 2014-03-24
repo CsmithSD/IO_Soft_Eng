@@ -1,0 +1,126 @@
+% !TEX root = SystemTemplate.tex
+\chapter{User Stories, Backlog and Requirements}
+\section{Overview}
+
+
+This system is for professors to test their students' programs against test data contained in text files. The results of these
+tests will then be written to a text file for th user to evaluate the tested programs performance.
+
+ Title: Dr. Logar's User Story
+As a professor I want to have a program compile, run, test, and evaluate the tests run on a program submitted to me by 
+my students so that I no longer have to run each test case individually and evaluate them by hand.
+
+
+The progam should compile and run a program against all test cases contained in files ending in ".tst" within the current 
+directory or within a subdirectory. In addition, it will evaluate the passes and fails of the program and log this in a text 
+document for user review.
+
+
+\subsection{Scope}
+The purpose of this project is to create a program that will run another program against test documents and output the 
+results into another file forthe user. The program is specifically geared toward computer science professors for their use in 
+grading student programs. This program will compile and run the submitted program imputting the test data. The results, which are saved to a text document, are evaluated and and percentage of pass/fail is also computed and saved in the
+document.
+
+What scope does this document cover?  This document would contain stakeholder information, 
+initial user stories, requirements, proof of concept results, and various research 
+task results. 
+
+
+
+\subsection{Purpose of the System}
+This system is designed in order to make it easier for professors to grade their students programs. The test files need only be 
+in the same directory (or within a subdirectory) as the program to be compiled and run. Also, the output is to be detailed 
+enough so that the user knows exactly which test cases passed and which failed.
+
+
+\section{ Stakeholder Information}
+
+
+There are only two main stake holders in this project. The first is Dr, Logar, our customer, who naturally expects a working
+progam. The second stake holder is this team who greatly desires an A in this course.
+
+
+\subsection{Customer or End User (Product Owner)}
+Dr. Logar is our customer and end user in this case.  
+
+\subsection{Management or Instructor (Scrum Master)}
+Cris Smith is our Scrum Master. He plans the time line we are to follow as well as the scrum meetings 
+
+
+\subsection{Investors}
+There are no Investors.
+
+
+\subsection{Developers --Testers}
+There is not set developer(s) or tester(s). We divide up the work as evenly as possible. After running our own tests on our 
+code we are sure to test the finished product to ensure integrating the code was successful.
+
+
+\section{Business Need}
+This program is aimed at reducing the amount of time a professor must personally spend on each program by automating
+the test phase.
+
+\section{Requirements and Design Constraints}
+The main constraint of this program is that it must run on a Linux based operating system and be used to compile C++
+programs. Other constraints are that this program does require a basic knowledge of command line compiling.
+
+
+\subsection{System  Requirements}
+The system requirements are that only C++ programs be used with this project on a Linuz machine.
+
+
+\subsection{Network Requirements}
+There are no network requirements as everything can be done offline.
+
+
+\subsection{Development Environment Requirements}
+Our developement enviornment is Linux using simple text editors with g++ compile command.
+
+
+\subsection{Project  Management Methodology}
+The stakeholders might restrict how the project implementation will be managed. 
+ There may be constraints on when design meetings will take place.  There might 
+be restrictions on how often progress reports need to be provided and to whom. 
+ 
+\begin{itemize}
+\item What system will be used to keep track of the backlogs and sprint status?
+\item Will all parties have access to the Sprint and Product Backlogs?
+\item How many Sprints will encompass this particular project?
+\item How long are the Sprint Cycles?
+\item Are there restrictions on source control? 
+\end{itemize}
+
+\section{User Stories}
+
+
+
+
+\subsection{User Story \#1}
+ Title: Dr. Logar's User Story
+As a professor I want to have a program compile, run, test, and evaluate the tests run on a program submitted to me by 
+my students so that I no longer have to run each test case individually and evaluate them by hand. 
+
+\subsubsection{User Story \#1 Breakdown}
+This user story is very straight forward yet complex. The first major requirement is we compile and run a program automatically. Secondly the output must be evaluated and a report prepared for the user.
+
+\subsection{User Story \#2} 
+Titile: Revisions to make life  easier. It is also desired that this test suite runs all test files contained in a test directory against each program submitted by a student. Each student will have their own directory where the result file should be stored. 
+
+\subsubsection{User Story \#2 Breakdown}
+The important information contained here is how we traverse the file structure and where we find test cases and store the results.
+
+\subsection{User Story \#3} 
+Title: Automatic tests. As I am quite busy I would like to have the test suite generate its own tests so that I don't have to. It will store these tests in the tests subdirectory and generate the answer file for each test. 
+
+
+\subsubsection{User Story \#3 Breakdown}
+This is pretty simple and straightforward. All that needs doing running a program against randomly generated test cases.
+
+
+\section{Research or Proof of Concept Results}
+Intentially left blank
+
+
+\section{Supporting Material}
+Intentinally left blank

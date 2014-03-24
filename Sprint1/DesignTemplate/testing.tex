@@ -1,0 +1,18 @@
+% !TEX root = SystemTemplate.tex
+
+\chapter{System  and Unit Testing}
+
+This section describes the approach taken with regard to system and unit testing. 
+
+\section{Overview}
+Originally, the test suite was run against the test files verifying it ran the tests against the .cpp file correctly. The primary tests to make sure our walk through the directory was done correctly. This means we exaust all directories and run all .tst files.
+
+
+
+\section{Dependencies}
+The program requires *.tst and *.ans files that are either in the same directory as the *.cpp file or in a sub-directory of that directory.
+
+\section{Test Setup and Execution}
+Dr. Logar provided several test files and directories for the program to process. The executable was copied into each of the directories containing a *.cpp file to test against. We verified all these cases were handled successfully. 
+In addition to the tests provided by Dr. Logar we also a few tests checking some of the directory bountries. Such tests include running without any subdirectories, running with all subdirectories empty, having nested subdirectories each with varing numbers of test cases ranging from zero to ten.
+
