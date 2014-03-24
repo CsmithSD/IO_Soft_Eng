@@ -507,6 +507,21 @@ void nameExec( std::string &exec )
     exec+="_exec";
 }
 
+/*****************************************************************************
+ * @author Chris Smith
+ *
+ * @description This function finds the crit tests. When they are found it calls
+ *              run crit test. It then searches for the next crit test and
+ *              repeats.
+ *              
+ *
+ * @param[in] curDir - the path to the current directory
+ * @param[in] logFile - the log file name
+ * @param[in] exec - name of the executable to be run against the crit test
+ * @param[in] pass_fail - a string holding "PASSED" or "FAILED"
+ * @param[in] studentName - the student's name
+ *
+ * ***************************************************************************/
 std::string critTest(std::string curDir, std::string logFile, std::string exec,
         std::string pass_fail, const std::string &studentName )
 {
@@ -515,18 +530,23 @@ std::string critTest(std::string curDir, std::string logFile, std::string exec,
     int n;
     std::string tmp;
     int i;
+
     //scans the current directory for all 
     //types stores how many are found in n and the names in namelist
     n = scandir(curDir.c_str(), &namelist, 0, alphasort);
+
     if(n == -1)
         return pass_fail;
+
     //starts at the second position since 
     //the first two files found are the . and .. directories
     for(i = 2; i<n; i++)
     {
-        if(std::string(namelist[i] -> d_name).find("_crit.tst") != std::string::npos)
+        if(std::string(namelist[i] -> d_name).find("_crit.tst")
+                       != std::string::npos)
         {
-            if(runCritTst( curDir+"/"+ std::string(namelist[i] -> d_name), exec, logFile, studentName))
+            if(runCritTst( curDir+"/"+ std::string(namelist[i] -> d_name), exec,
+                           logFile, studentName))
             {
                 pass_fail = "FAILED";
             }
@@ -542,6 +562,23 @@ std::string critTest(std::string curDir, std::string logFile, std::string exec,
     return pass_fail;
 }
 
+/*****************************************************************************
+ * @author: Chris Smith
+ *
+ * @description This function will builds the names for the .out and .ans files
+ *              based on the crit test file name provided. It then runs the
+ *              executable against the crit test. The output from that is sent
+ *              to the .out file which is compared with the .ans file using
+ *              the diff command. If they are the same then it is passed, 
+ *              otherwise it failed.
+ *              
+ *
+ * @param[in] critTst - name of the critical test file
+ * @param[in] exec - name of the executable to be run against the crit test
+ * @param[in] logFile - the log file name
+ * @param[in] studentName - the student's name
+ *
+ * ***************************************************************************/
 bool runCritTst( std::string critTst, std::string exec, std::string logFile, const std::string &studentName) 
 {
     std::string out_file = critTst;
@@ -848,6 +885,8 @@ void writeSummaryLog( std::string student_name, std::string result,
     //in the summary log file name replace spaces with underscores
     for(int i = 14; i < summary_file_name.length(); i++)
     {
+        if(summary_file_name[i] == ':')
+            summary_file_name[i] = '.';
         if(summary_file_name[i]==' ')
             summary_file_name[i] = '_';
         if(summary_file_name[i] == '\n')
