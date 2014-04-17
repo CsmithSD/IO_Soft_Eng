@@ -54,7 +54,7 @@ great convenience as it saves time during the grading process.
 \subsection{Customer or End User (Product Owner)}
 Charles Parsons is the Product Owner of this project. He is in charge of understanding the requirements set forth by our
 customer, Dr. A. Logar, managing the product backlog, keeping the rest of the team up to date on what
-needs to be done in an overall sence, and writing a portion of the code that is required.
+needs to be done in an overall sense, and writing a portion of the code that is required.
 
 % Who?  What role will they play in the project?  Will this person or group manage 
 % and prioritize the product backlog?  Who will they interact with on the team to 
@@ -133,36 +133,64 @@ The program has been developed for use on a Linux System.
 
 
 
-\subsection{User Story \#1}
+\subsection{User Story Sprint 1 \#1}
 As a user I want the program to read in the .tst files and test them on the program.
 
 We want to read in .tst file and run them on the compiled program.
 
-%\subsubsection{User Story \#1 Breakdown}
-%Does the first user story need some division into smaller, consumable parts by 
-%the reader?  This does not need to go to the level of actual task definition and 
-%may not be required. 
+\subsubsection{User Story Sprint 1 \#1 Breakdown}
+The test suite will need to compile a program on the command line and run it using redirected input and output to use the test file.
 
-\subsection{User Story \#2} 
+\subsection{User Story Sprint 1 \#2} 
 As a user I want the program to compile the .cpp file.
-
 We want to be able to compile the student's .cpp file that is in the root directory.
 
 
 %\subsubsection{User Story \#2 Breakdown}
 %User story \#2  .... 
 
-\subsection{User Story \#3} 
+\subsection{User Story Sprint 1 \#3} 
 As a user I want the program to store the percentage of pass and failed test cases in the .log file
 
-\subsection{User Story \#4}
-As a user I want the program to crawl through a directory looking for .tst files.
- We want to be able to crawl through all subdirectories looking for .tst files to test on.
+\subsection{User Story Sprint 1 Breakdown\ #3}
+A log file will need to be created in the root directory storing all the results of the test suite.
 
+\subsection{User Story Sprint 2 \#1}
+Process the programs of an entire class just given the directory.
+ 
+\subsection{User Story Sprint 2 Breakdown\#1}
+The test suite will be placed in the root directory. This directory is to be traversed by the test suite to compile and test every .cpp file within the directory or any sub-directory. 
 
-%\subsubsection{User Story \#3 Breakdown}
-%User story \#3  .... 
+\subsection{User Story Sprint 2 \#2}
+Use acceptance tests to pass or fail a program based on outcome.
 
+\subsection{User Story Sprint 2 Breakdown \#2}
+Certain tests shall be labeled as acceptance tests upon which a passing grade for the programs will depend. If they do not pass a failing grade will be assigned. If some are passed then the percentage of passed tests is assigned as a grade.
+
+\subsection{User Story Sprint 2 \#3}
+Make a log file for each specific student and cumulative file in the root directory.
+
+\subsection{User Story Sprint 2 Breakdown \#3}
+An individual log file will be stored in each students sub-directory and a summary file will be placed in the root directory. The summary file will be named CS150.log.
+
+\subsection{User Story Sprint 2 \#4}
+Run multiple tests all of which will be stored in a test sub-directory.
+
+\subsection{User Story Sprint 2 Breakdown \#4}
+All tests are guaranteed to be stored in a sub-directory called "tests".
+This sub-directory will be stored in the root directory. There may be sub-directories within the tests' directory.
+
+\subsection{User Story Sprint 2 \#5}
+Automatically generate test files for the test suite to run. Store these tests in the tests sub-directory.
+
+\subsection{User Story Sprint 2 Breakdown \#5}
+The test suite will, at the users request, write files of randomly generated integers or floats as specified by the user. The limit of files will also be specified by the user. The number of integers or floats will be a random number from 1 to 200.
+
+\subsection{User Story Sprint 2 \#6}
+Create prompts for the user to make choices concerning the random tests without having to use the execution statement.
+
+\subsection{User Story Sprint 2 Breakdown \#6}
+Instead of getting all information from the execution of the test suite, prompt the user for information such as  whether they wish to generate test cases and which kind they wish to generate. 
 
 %\section{Research or Proof of Concept Results}
 %This section is reserved for the discussion centered on any research that needed 
