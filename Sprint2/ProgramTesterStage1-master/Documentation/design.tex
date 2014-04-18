@@ -324,4 +324,127 @@ std::string FinalLogWrite( std::string &log_file, int numPassed, int numTest )
 }
 \end{lstlisting}
 
+\pagebreak
 
+\section{Sprint2 Data FLow}
+
+\subsection{Data Flow Diagram Sprint 2}
+
+Figure~\ref{DataFlowSprint2} Shows the entire Data Flow of Sprint 2.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.75\textwidth]{./DataFlowSprint2}
+\end{center}
+\caption{Data Flow for Sprint 2 \label{DataFlowSprint2}}
+\end{figure}
+
+The added features to the data flow diagram allows the user to choose to create more test files if they desire. Also the program runs the student cpp files against designated crit test files first and if they fail it logs a failure for the student in the summary file. After there are no more crit files to run against a student cpp file it searches for regular tst files and logs the results like previously and finaly writes the total percentage for the student in the summary file. In addition of running one cpp file the program searches for multiple student files and runs and logs them in the above fashion.
+
+\subsection{Design Detail}
+\begin{lstlisting}
+void generateTst(std::string choice)
+{
+
+    //variables
+    std::ofstream fout;
+    int randNum,i,j;
+    double randNum2;
+    std::string filePath = "./tests/";
+    std::string name = "Program_Tester_Generated_test";
+    std::string ext = ".tst";
+    std::string num;
+    std::string filename;
+    std::ostringstream convert;
+    int max1, max2, temp;
+    srand(time(NULL)); 
+    max1 = rand() % MAX_TEST + 1;
+//Generates list of numbers (ints or floats)
+    for(j = 0; j < max1; j++)
+    {
+        //names test file  
+        temp = j;
+        convert << temp;
+        num = convert.str();
+        convert.str("");
+        filename = filePath + name + num + ext;
+
+        fout.open(filename.c_str());
+        if(!fout)
+        {
+            std::cout << "Could not open " << filename << std::endl;
+        }
+        if(choice == "int")
+        {
+            max2 = rand() % MAX_LIST + 1;
+
+            for(i= 0; i < max2; i++)
+            {
+                //generate rand number
+                randNum = rand();
+
+                fout << randNum << std::endl;
+
+            }
+        }//end if
+        else
+        {
+            //initialize random seed
+            srand(time(NULL)); 
+            max2 = rand() % MAX_LIST + 1;
+
+            for(i= 0; i < max2; i++)
+            {
+                //generate rand number
+                randNum = rand();
+                randNum2 = rand();
+
+                while(randNum2 > 0)
+                {
+                    randNum2 /= 10;
+                }
+                randNum2 = double(randNum) + randNum2;
+
+                fout << randNum2 << std::endl;
+            }//end For
+        }//end Else
+
+        fout.close();
+
+
+        sysProg(filename);
+    }//end for loop
+}
+\end{lstlisting}
+
+\begin{lstlisting}
+void writeSummaryLog( std::string student_name, std::string result,
+        time_t timer )
+{
+    std::ofstream fout;
+    std::string summary_file_name;
+
+    //build the summary log file name
+    summary_file_name = "class_summary_" + std::string(ctime(&timer)) + ".log";
+
+    //in the summary log file name replace spaces with underscores
+    for(int i = 14; i < summary_file_name.length(); i++)
+    {
+        if(summary_file_name[i] == ':')
+            summary_file_name[i] = '.';
+        if(summary_file_name[i]==' ')
+            summary_file_name[i] = '_';
+        if(summary_file_name[i] == '\n')
+            summary_file_name.erase(summary_file_name.begin()+i);
+    }
+
+    //open the summary log file for appending
+    fout.open( summary_file_name.c_str(), std::ios::app | std::ios::out );
+
+    //write entry to log file
+    fout << std::left << std::setw( 50 ) << student_name << std::setw( 20 )
+        << result << std::endl << std::right;
+
+    fout.close();
+}
+\end{lstlisting}
