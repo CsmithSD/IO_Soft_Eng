@@ -1,0 +1,39 @@
+% !TEX root = SystemTemplate.tex
+
+\chapter{User Documentation}
+
+The only step to setting up the tester program is to download the source code and run 
+make. The application compiles into one executable which may be run from the command line.
+
+\section{Installation Guide}
+Steps for proper installation:
+\begin{enumerate}
+	\item Download the source code package.
+	\item Use the provided Makefile to compile the {\it Grade} program.
+	\item Copy the {\it Grade} executable into the class directory.
+	\item Setup the class directory as shown in Figure~\ref{directorylayout}.
+\end{enumerate}
+
+\section{User Guide}
+\textbf{Using the {\it Grade} program to grade student programs:}
+\begin{enumerate}
+	\item Install the {\it Grade} program as described above.
+	\item Populate the test\_int and test\_float directories with test and answer files.
+	\item Run the {\it Grade} executable. (\$ ./Grade)
+	\item In the main menu, choose option 1 (Grade Student Programs).
+	\item The program will automatically compile and execute the student programs with the provided test cases as input.
+	\item Open the .log file in the root directory for an overview of the class results.
+	\item Individual student log files can be found in the student directories.
+\end{enumerate}
+
+\noindent \textbf {Using the {\it Grade} program to generate test cases:}
+\begin{enumerate}
+	\item Install the {\it Grade} program as described above.
+	\item Run the {\it Grade} executable (\$ ./Grade).
+	\item In the main menu, select option 2 (Generate Test Files).
+	\item Provide the information prompted by the program.
+	\item Test files will be created in the test\_int and test\_float directories.
+\end{enumerate}
+
+%\section{Programmer Manual}
+%None

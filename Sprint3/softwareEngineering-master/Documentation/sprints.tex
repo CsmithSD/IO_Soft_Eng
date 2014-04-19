@@ -1,0 +1,151 @@
+% !TEX root = SystemTemplate.tex
+
+\chapter{Sprint Reports}
+
+
+
+\section{Sprint Report \#1}
+\textbf{Note:} The first sprint of this source code was carried out by the Intolerable Optimists. However, a report for sprint \#1 was not included in the exchange of information between teams. Therefore, the Obfuscators' sprint \#1 report was included.\\
+\\The review was conducted with the product owner, the technical lead, and the scrum master.\\
+\\ \textbf{Team Members and Roles:}
+\\ Elizabeth Woody - Scrum Master
+\\ Joseph Lillo - Technical Lead
+\\ Daniel Nix - Product Owner
+
+\subsection{Code Development}
+The following were designed and written by Joseph Lillo:
+\begin{description}
+\item [TestSuite Class Declaration]- This class provides an interface for compiling and testing c++ programs against given test files.
+\item [dirCrawl] - a function used to perform a recursive Directory Crawl \\ \\
+\end{description}
+The following were designed and written by Daniel Nix:
+\begin{description}
+\item [compile\_code] - a function used to compile c++ source code based on filename
+\item [run\_code]- a function used to run c++ souce with redirected input/output
+\item [correct\_answer]- a function used to do diff on answer file and test program output file \\  \\
+\end{description}
+The following were designed and written by Lisa Woody:
+\begin{description}
+\item [Software Documentation and formatting] - the final software write up for the project
+\item [Log file output functions]-  functions later integrated into other functions upon team review of the program. \\
+\end{description}
+The following were designed and written by the Obfuscators as a team:
+\begin{description}
+\item [runTests] - a function used to run a program with input from test files in the testFiles vector
+\item [reset]-  a function used to clear member data associated with testing session.
+\end{description}
+
+
+
+
+\subsection{Final Product Review}
+
+The final application, having passed the final testing stages, was demonstrated.  \\
+\begin{description}
+\item [$\bullet$] Has every phase of the project been completed? 
+\item Yes, each of the four phases of the project have been completed.
+\item [$\bullet$]Have the phases been successfully integrated into the final product?
+\item Yes, the phases are completely integrated into the final product.
+\item [$\bullet$] Can the application run the client-provided test files without error?
+\item Yes, the application compiles and no errors were found.
+\item [$\bullet$] Does the final output match the intended and requested output?
+\item Yes, the outputted log file matches the requested format.\\
+
+\item Next, the documentation was reviewed. \\
+
+\item [$\bullet$] Has the documentation been completely filled out and reviewed by each team member?
+\item Yes, the documentation has been completed and reviewed. 
+\item [$\bullet$] Does the product meet the requirements and needs of each user story?
+\item Yes, the product fulfills the needs of each user story laid out in the documentation.
+\item [$\bullet$] Does the product satisfy the product backlog and is it deemed deliverable by the product owner?
+\item Yes, the product owner is deemed complete and deliverable by the product owner.\\
+
+\item The team is happy with this sprint, and feels that next time it will be prepared for the newly learned Agile methodology and documentation style.\\
+\end{description}
+
+\section{Sprint Report \#2}
+
+The following report was compiled by the Obfuscators team in review of sprint \#2.\\
+\\ \textbf{Team Members and Roles:}
+\\ Elizabeth Woody - Product Owner
+\\ Joseph Lillo - Scrum Master
+\\ Daniel Nix - Technical Lead
+
+\subsection{Sprint 1 Requirements Review}
+Our team inherited sprint \#1 source code from the Intolerable Optimists. Therefore, we conducted a review of sprint \#1 requirements before starting sprint \#2 with the new code.\\
+The following table represents our findings:
+
+\begin{center}
+    \begin{tabular}{| l | l |}
+    \hline
+     Requirement & Met? \\ \hline
+    Compilation of the sample program & \multicolumn{1}{|c|}{\checkmark}\\ \hline
+    Directory traversal for test files  & \multicolumn{1}{|c|}{\checkmark}\\ \hline
+	Execution of the sample program with the test cases as input & \multicolumn{1}{|c|}{\checkmark}\\ \hline
+	Generation of a log file with correct pass/fail statistics & \multicolumn{1}{|c|}{\checkmark}\\ \hline
+	Preservation of existing log files by following a time stamped file naming convention & \multicolumn{1}{|c|}{x}\\ \hline
+    \end{tabular}
+\end{center}
+
+After ensuring that all sprint \#1 requirements were met, we continued with sprint \#2.
+
+\subsection{New Features Review}
+
+Sprint \#2 included the following new requirements:
+
+\begin{enumerate}
+	\item Grade student programs for an entire class.
+	\item Utilize critical test cases with a pass/fail result.
+	\item Generate new test cases.
+\end{enumerate}
+
+\noindent These requirements were broken down further into a list of goals for sprint \#2:
+
+\begin{enumerate}
+	\item Process the whole class. Implement a directory crawl that find each student's directory and program.
+	\item Create a time-stamped, summary log file in the main CSC 150 directory. This will be time stamped and reflect the grade of every student.
+	\item Grade the programs, PART 1. Test the program against established critical test cases, which must be found in the "Test" directory. Failing any critical test case will result in "FAILED" being recorded as the grade in the log file and the rest of the testing for that student's program aborted.
+	\item Grade the programs, PART 2. Integrate the code from sprint 1 to test the programs that passed with test cases found in the "Test" directory. The success rate will be entered as the grade in the for that student in the grading log file.
+	\item Add an option to the beginning of the program, which will allow the user to opt to either generate test cases or to test. If the user chooses the former, they must clarify the necessary test case details.
+	\item According to the user's specifications, generate the .tst files using a simple number generator.
+	\item Generate .ans files by running the generated .tst file against the "golden cpp" file found in the main CSC 150 directory.
+	
+\end{enumerate}
+
+\noindent To fulfill these goals, the following items were included in the sprint backlog:
+
+\begin{center}
+    \begin{tabular}{| l | l | l | l |}
+    \hline
+     Task & Assigned to & Fulfills Goal \# & Effort Estimate \\ \hline
+    
+    Add search pattern to directory crawl & Joe Lillo & \multicolumn{1}{|c|} 1 & \multicolumn{1}{|c|} 1 \\ \hline
+    
+    Return list of files from directory crawl. & Joe Lillo & \multicolumn{1}{|c|} 1 & \multicolumn{1}{|c|} 5 \\ \hline
+    
+    Create "single-student main log" output function. & Elizabeth Woody & \multicolumn{1}{|c|} 2 & \multicolumn{1}{|c|} 1 \\ \hline
+    
+   Create "init" function. & Elizabeth Woody & \multicolumn{1}{|c|} 2 & \multicolumn{1}{|c|} 1 \\ \hline
+   
+   Create individual student log file & Elizabeth Woody & \multicolumn{1}{|c|} {3 4 5} & \multicolumn{1}{|c|} 1 \\ \hline
+   
+   Write individual pass/fail line to student log & Elizabeth Woody & \multicolumn{1}{|c|} {3 4} & \multicolumn{1}{|c|} 1 \\ \hline
+      
+   Stop testing after critical test failure & Elizabeth Woody & \multicolumn{1}{|c|} 3 & \multicolumn{1}{|c|} {0.5} \\ \hline
+   
+   Integrate testing function and single-student main-log function. & Elizabeth Woody & \multicolumn{1}{|c|} 4 & \multicolumn{1}{|c|} {1} \\ \hline
+   
+   Make main menu to choose testing or create test files & Dan Nix & \multicolumn{1}{|c|} {5} & \multicolumn{1}{|c|} {1} \\ \hline
+   Create "test file maker" function & Dan Nix & \multicolumn{1}{|c|} {5 6} & \multicolumn{1}{|c|} {2} \\ \hline
+
+   Generate ".ans" files & Dan Nix & \multicolumn{1}{|c|} {7} & \multicolumn{1}{|c|} {2} \\ \hline
+   
+    \end{tabular}
+\end{center}
+
+After completing the items in the sprint backlog, the team reviewed the program to ensure all sprint \#2 goals were met. Testing procedures are documented in section 5 of this document.\\
+\\After the product owner checked off on all of the requirements, the team deemed the program fit for release.
+
+
+%\section{Sprint Report \#3}
+%None

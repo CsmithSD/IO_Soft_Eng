@@ -1,0 +1,116 @@
+% !TEX root = SystemTemplate.tex
+\chapter{User Stories, Backlog and Requirements}
+\section{Overview}
+
+\subsection{Scope}
+The purpose of this document is to provide a detailed description of the end user's requirements
+for this software product, as well as a development plan for satisfying each of these requirements
+in the program design and implementation.  This section will also contain the stakeholder information, 
+initial user stories, and requirements. 
+
+\subsection{Purpose of the System}
+The purpose of this system is to provide the user with a grading program.  This program will find and run each program to be tested against existing test cases, and provide a grading summary of the results, as well as a personal log for each tested program.  This grading program will be capable of accounting for critical test cases and provide a system for creating test cases according to desired criteria. The program is specifically geared toward computer science professors for their use in 
+grading student programs.
+
+
+\section{ Stakeholder Information}
+
+\subsection{Customer or End User (Product Owner)}
+Lisa Woody is the Product Owner of this project.  She will clarify and define the End Users' needs and requirements 
+for this product, as well as establish and prioritize the product backlog.
+
+\subsection{Management or Instructor (Scrum Master)}
+Joe Lillo is the Scrum Master for the project.  He is responsible for scheduling the project meetings, as well as 
+determining and assigning the tasks necessary to deliver the required product.
+
+\subsection{Developers --Testers}
+Dan Nix is the Technical Lead and for the project.  He will be responsible for the high level design and final
+testing of the program.
+
+\section{Business Need}
+This software must simplify and automate the grading process, by aiming at reducing the amount of time a professor must personally spend on grading each student's program.  The product will meet that need and enable 
+the end user to not only maintain a detailed, dated record of each test and the grading summary, but also create customized new test cases according to thier requirements.and its detailed output.
+
+\section{Requirements and Design Constraints}
+
+\subsection{System  Requirements}
+
+\begin{description}
+\item [$\bullet$] The program must build and run in a Linux environment.
+\item [$\bullet$] The source code for programs to be "tested" will be in C++.
+\item [$\bullet$] The executable of this program will be in the CSC150 directory.
+\item [$\bullet$] A bash shell will be used to run the program
+\end{description}
+
+\subsection{Network Requirements}
+None
+
+
+\subsection{Development Environment Requirements}
+
+\begin{description}
+\item [$\bullet$] The application must be written in C++
+\item [$\bullet$] All work must be done in Linux
+\item [$\bullet$] System calls (gcc, etc.) may be used in the application.
+\item [$\bullet$] The test case input will be stored in a .tst file. The accompanying
+ desired output \\ will be stored in a .ans file.
+\item [$\bullet$] Testing output for individual programs should be in one log file which contains: \\
+\hspace{4ex} Test output results (i.e., 52 different tests will produce 52 lines in the .log file) \\
+\hspace{4ex} Number passed, Number failed, Percentage of success
+\item [$\bullet$] The main summary log file will be time stamped and stored in the main CSC 150 directory
+\end{description}
+
+
+\subsection{Project  Management Methodology}
+There is only one customer for this application. This customer may place constraints
+on meeting times and frequency of required progress reports. 
+\\
+\\Aside from customer
+requests meeting times and reports will be managed by the scrum master.
+\\ 
+\\For the first iteration, we need to compile and test only one program. 
+\\
+\\For the second iteration, the program from the first iteration must be expanded to encompass the new requirements, 
+as in the first iteration, only a single program must be compiled and tested.
+
+ 
+\begin{itemize}
+\item Trello, a free web-based project management application, will be used to keep
+         track of the backlogs and sprint status.
+\item All parties have access to the Sprint and Product Backlogs, via Trello.
+\item This particular project will be encompassed by only one Sprint.
+\item The Sprint Cycle of this project is two weeks.
+\item The source control will be carried out using GitHub
+\end{itemize}
+
+\section{User Stories}
+
+\subsection{User Story \#1}
+As a user of the program, I would like to be able to specify a program to grade that will test the program and create a record of easy to understand output.
+
+\subsubsection{User Story \#1 Breakdown}
+This application will be targeted towards instructors needing to test submitted student programs against applicable test
+cases.  The application will be run from the command line, using the name of the program to be tested as an inital parameter.
+For each existing test case, the program will be run using that test case's .tst file as input.  The output will be recorded and 
+compared to the accompanying answer file for that test case.  A summary of the results must accompany the recorded
+output in the log file created each time the application is run.
+
+
+\subsection{User Story \#2} 
+As a user of the program, I would like to be able to be able to grade the programs of all students in the directory, so that I can have a detailed summary of the results.
+\subsubsection{User Story \#2 Breakdown}
+A product that will find and grade a program for each student in the CSC 150 class, using acceptance testing and general test cases. A time-stamped summary will be placed in the CSC 150 folder, containing the grade of every student.  A grade of "FAILED" will be recorded in this summary if the student's program fails any of the acceptance test cases.  If the student passes the acceptance testing, the grade will be comprised of the rate of success that program has against the other test cases existing in the "Test" directory.
+
+\subsection{User Story \#3} 
+As a user of the program, I would like to be able to generate test cases, so that I can easily add test cases according to my specific requirements.
+\subsubsection{User Story \#3 Breakdown}
+This product must give the option of generating test cases for testing a simple program that finds properties in a list.  The user must be able to declare the number of test cases needed, the range the numbers can cover, and the maximum number of numbers in the list.
+
+
+\section{Research or Proof of Concept Results}
+None
+
+
+\section{Supporting Material}
+None
+

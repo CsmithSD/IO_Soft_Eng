@@ -1,0 +1,76 @@
+% !TEX root = SystemTemplate.tex
+
+\chapter{System  and Unit Testing}
+
+\section{Overview}
+Unit testing on individual source code functions occurred during the development process. The programmers utilized a {\it transparent-box} testing approach to ensure their functions performed correctly with expected, edge-case, and unexpected input.\\\\
+A {\it black-box} approach was used to test the functional requirements of the system. See section 5.3 {\it (Test Setup and Execution)} for more information on system requirements testing.
+
+\section{Dependencies}
+Successful execution of this program depends on a correct class directory structure. See Figure ~\ref{directorylayout} for more information on this structure.
+
+
+\section{Test Setup and Execution}
+The following test matrix was constructed to ensure the functional requirements of the program. Each row in the table (See Table~\ref{SysReqtable}) represents a test case. Columns in the table represent functional requirements of the program. The results of each test are recorded with respect to each of the requirements.
+\pagebreak
+\begin{center}
+\checkmark = Expected Results, x = Failing Results
+\end{center}
+
+\begin{table}[tbh]
+\begin{center}
+\begin{tabular}{| l | l | l | l |}
+
+
+\hline
+Test Case & Program Execution & Main Log File & Individual Log Files \\ \hline
+   
+    No student files and no test files & \multicolumn{1}{|c|}{\checkmark} & \multicolumn{1}{|c|}{\checkmark} & \multicolumn{1}{|c|}{\checkmark} \\ \hline
+    
+    No student files and test files & \multicolumn{1}{|c|}{\checkmark} & \multicolumn{1}{|c|}{\checkmark} & \multicolumn{1}{|c|}{\checkmark} \\ \hline
+    
+   Student files and critical tests only & \multicolumn{1}{|c|}{\checkmark} & \multicolumn{1}{|c|}{\checkmark} & \multicolumn{1}{|c|}{\checkmark} \\ \hline
+   
+   Student files and non critical tests only & \multicolumn{1}{|c|}{\checkmark} & \multicolumn{1}{|c|}{\checkmark} & \multicolumn{1}{|c|}{\checkmark} \\ \hline
+   
+   One critical test and many normal tests & \multicolumn{1}{|c|}{\checkmark} & \multicolumn{1}{|c|}{\checkmark} & \multicolumn{1}{|c|}{\checkmark} \\ \hline
+   
+   Many critical tests and many normal tests & \multicolumn{1}{|c|}{\checkmark} & \multicolumn{1}{|c|}{\checkmark} & \multicolumn{1}{|c|}{\checkmark} \\ \hline
+   
+   Floating point tests only & \multicolumn{1}{|c|}{\checkmark} & \multicolumn{1}{|c|}{\checkmark} & \multicolumn{1}{|c|}{\checkmark} \\ \hline
+   
+   Integer tests only & \multicolumn{1}{|c|}{\checkmark} & \multicolumn{1}{|c|}{\checkmark} & \multicolumn{1}{|c|}{\checkmark} \\ \hline
+   
+   Student c++ files $\neq$ student directory name & \multicolumn{1}{|c|}{\checkmark} & \multicolumn{1}{|c|}{\checkmark} & \multicolumn{1}{|c|}{\checkmark} \\ \hline
+   
+   Students failing critical tests & \multicolumn{1}{|c|}{\checkmark} & \multicolumn{1}{|c|}{\checkmark} & \multicolumn{1}{|c|}{\checkmark} \\ \hline
+   
+   Students passing all tests & \multicolumn{1}{|c|}{\checkmark} & \multicolumn{1}{|c|}{\checkmark} & \multicolumn{1}{|c|}{\checkmark} \\ \hline
+   
+   Students passing critical tests but not all normal tests & \multicolumn{1}{|c|}{\checkmark} & \multicolumn{1}{|c|}{\checkmark} & \multicolumn{1}{|c|}{\checkmark} \\ \hline
+   
+   Integer test file generation & \multicolumn{1}{|c|}{\checkmark} & \multicolumn{1}{|c|}{N/A} & \multicolumn{1}{|c|}{N/A} \\ \hline
+   
+   Floating point test file generation & \multicolumn{1}{|c|}{\checkmark} & \multicolumn{1}{|c|}{N/A} & \multicolumn{1}{|c|}{N/A} \\ \hline
+   
+   Generate test files with no "golden" .cpp file & \multicolumn{1}{|c|}{x} & \multicolumn{1}{|c|}{N/A} & \multicolumn{1}{|c|}{N/A} \\ \hline
+  
+  Test program multiple times without exiting & \multicolumn{1}{|c|}{\checkmark} & \multicolumn{1}{|c|}{\checkmark} & \multicolumn{1}{|c|}{\checkmark} \\ \hline
+  
+  Generate test files multiple times without exiting & \multicolumn{1}{|c|}{\checkmark} & \multicolumn{1}{|c|}{N/A} & \multicolumn{1}{|c|}{N/A} \\ \hline
+  
+  Generate test files and test the programs without exiting & \multicolumn{1}{|c|}{\checkmark} & \multicolumn{1}{|c|}{\checkmark} & \multicolumn{1}{|c|}{\checkmark} \\ \hline
+  
+  Improper numerical input for menu options & \multicolumn{1}{|c|}{\checkmark} & \multicolumn{1}{|c|}{\checkmark} & \multicolumn{1}{|c|}{\checkmark} \\ \hline
+  
+  Entering strings for numerical input & \multicolumn{1}{|c|}{x} & \multicolumn{1}{|c|}{x} & \multicolumn{1}{|c|}{x} \\ \hline
+
+\end{tabular}
+\caption{System Requirements Tests Table \label{SysReqtable}}
+\end{center}
+\end{table}
+
+
+
+
+
