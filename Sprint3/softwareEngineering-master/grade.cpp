@@ -85,6 +85,7 @@ void directoryCrawl( bool , string , string , bool, vector <string> & names, boo
 bool test(const string &, string , string );
 int print_menu();
 bool create_test_cases();
+bool create_specific_test_cases( string );
 double generate_random( double min, double max, char type );
 string iToA( int i );
 bool create_ans_file( string , string );
@@ -94,6 +95,7 @@ void create_menu_test_cases(string);//creates the test cases for a menu driven p
 bool run_code( string , string  );
 string removeExtension (string );
 string fileNameFromPath (string );
+void grade_specific_assignment( string )//grades a specific directory
 
 /*! *******************************************************
  * \brief Main entry point of program.
@@ -108,7 +110,7 @@ int main( )
     time_t rawTime;
     tm * timeInfo;
     char buffer [40];
-
+    string specific_dir;
     int menuFLAG = 0;
 
     // Create menu until user chooses to exit
@@ -147,10 +149,24 @@ int main( )
             // Close the Grading Summary log file
             LOG.close();
         }
+        else if ( menuFlag == 2 )
+        {
+            cout << "Enter name of the directory to be graded: ";
+            cin >> specific_dir;
+
+            grade_specific_assignment( specific_dir );
+        }
         // If the user selects to create test cases
         else if ( menuFLAG == 3 )
         {
             create_test_cases();
+        }
+        else if ( menuFLAG == 4 )
+        {
+            cout << "Enter name of the directory for test case generation: ";
+            cin >> specific_dir;
+
+            create_specific_test_cases( specific_dir )
         }
 
 
@@ -635,7 +651,10 @@ bool create_test_cases()
     return true;
 }
 
+bool create_specific_test_cases( string assignment )
+{
 
+}
 
 
 /*! *******************************************************
