@@ -89,6 +89,8 @@ double generate_random( double min, double max, char type );
 string iToA( int i );
 bool create_ans_file( string , string );
 bool compile_code( string  );
+bool check_if_menu_prog( string );//Checks if program structure is menu driven
+void create_menu_test_cases(string);//creates the test cases for a menu driven program
 bool run_code( string , string  );
 string removeExtension (string );
 string fileNameFromPath (string );
@@ -110,7 +112,7 @@ int main( )
     int menuFLAG = 0;
 
     // Create menu until user chooses to exit
-    while ( menuFLAG != 3 )
+    while ( menuFLAG != 5 )
     {
         // Get user input from the menu
         menuFLAG = print_menu();
@@ -146,7 +148,7 @@ int main( )
             LOG.close();
         }
         // If the user selects to create test cases
-        else if ( menuFLAG == 2 )
+        else if ( menuFLAG == 3 )
         {
             create_test_cases();
         }
@@ -438,13 +440,15 @@ int print_menu()
     int choice = 0;
 	
     // While the user hasn't entered a valid choice, get a new choice
-    while( choice < 1 || choice > 3 )
+    while( choice < 1 || choice > 5 )
     {
 
         cout << "Main Menu:" << endl;
-        cout << "1. Test student programs" << endl;
-        cout << "2. Create test files" << endl;
-        cout << "3. EXIT" << endl;
+        cout << "1. Test all program assignments" << endl;
+        cout << "2. Test specific assignment"
+        cout << "3. Create test files for all assignments" << endl;
+        cout << "4. Create test files for specific assignment" << endl;
+        cout << "5. EXIT" << endl;
 
         cout << "Choice: ";
         cin >> choice;
@@ -708,8 +712,8 @@ string iToA( int i ){
  * \param filename - the name of the .cpp file
  * \return true - When the code is successfully compiled
  */
-bool compile_code( string filename ){
-
+bool compile_code( string filename )
+{
     // Strip off the .cpp extension
     string executable = removeExtension( filename );
     
@@ -725,6 +729,48 @@ bool compile_code( string filename ){
     return true;
 }
 
+bool check_if_menu_prog( string program_directory )//Checks if program structure is menu driven
+{
+    struct dirent **namelist;   //structure that contains files and directories that scandir is called
+
+    int n;                      //total of number files and directories in given directory
+    int i;                      //loop counter
+
+    string temp;                //tmp variable to conver c string to c++ string in loop
+    bool found = false;         //variable to be returned regardless of file found or not since its initially set to false
+    
+    // Scan dir for files and directories
+    n = scandir( program_directory.c_str(), &namelist, 0, alphasort );
+
+    // Error check
+    if(n == -1)
+        return;
+
+    //exits the loop if a spec file is found or the whole array is searched
+    for( i = 2; i < n && !found; i++)
+    {
+        //converts the c style string to a c++ string
+        tmp = string( namelist[i] );
+        //checks to see if the given string is a .spec file
+        if( tmp.find( ".spec" ) != string::npos )
+            //if the file is a spec file then found is set to true
+            found = true;
+    }
+
+    // Cleanup
+    for(i = 0; i < n; i++)
+        delete []namelist[i];
+    delete []namelist;
+
+
+    return found;
+
+}
+
+void create_menu_test_cases( string menu_file )//creates the test cases for a menu driven program
+{
+
+}
 
 
 /*! *******************************************************
