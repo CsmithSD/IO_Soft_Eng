@@ -96,7 +96,8 @@ bool run_code( string , string  );
 string removeExtension (string );
 string fileNameFromPath (string );
 void grade_specific_assignment( string )//grades a specific directory
-
+void grade_all_assignments();
+void create_all_test_cases();
 /*! *******************************************************
  * \brief Main entry point of program.
  * \return 0 - Success / Else - Error
@@ -122,54 +123,32 @@ int main( )
         // If the user selects to grade student programs...
         if ( menuFLAG == 1 )
         {
-            // Clear vectors containing test cases and directories
-            critTestCases.clear();
-            testCases.clear();
-            studentDirs.clear();
-
-            // Create time stamp string for files
-            time (&rawTime);
-            timeInfo = localtime (&rawTime);
-            strftime (buffer,40,"%d_%m_%y_%H_%M_%S",timeInfo);
-            string exeTime = buffer;
-            LOG.open(string("GRADES_"+exeTime+".log").c_str());
-
-            // Find all critical test cases
-            directoryCrawl( FILES,".", "_crit.tst", true, critTestCases, 1 );
-
-            // Find all regular test cases
-            directoryCrawl( FILES,".", ".tst", true, testCases, 0 );
-
-            // Find all student directories
-            directoryCrawl( DIRECTORIES,".", "", true, studentDirs, 0  );
-
-            // Grade programs against test cases
-            grade( critTestCases, testCases, studentDirs, LOG, exeTime );
-
-            // Close the Grading Summary log file
-            LOG.close();
+            grade_all_assignments();
         }
         else if ( menuFlag == 2 )
         {
             cout << "Enter name of the directory to be graded: ";
             cin >> specific_dir;
 
-            grade_specific_assignment( specific_dir );
+            grade_specific_assignment( specific_dir + "/" );
         }
         // If the user selects to create test cases
         else if ( menuFLAG == 3 )
         {
-            create_test_cases();
+            create_all_test_cases();
         }
         else if ( menuFLAG == 4 )
         {
             cout << "Enter name of the directory for test case generation: ";
             cin >> specific_dir;
 
-            create_specific_test_cases( specific_dir )
+            create_specific_test_cases( specific_dir + "/" )
         }
+        else
+            cout << "Invalid menu choice." << endl << endl;
 
 
+        cout << endl << endl;
     }
 
 }
@@ -653,7 +632,7 @@ bool create_test_cases()
 
 bool create_specific_test_cases( string assignment )
 {
-
+    //checks if menu assignment and goes through menu case generation or other generation
 }
 
 
@@ -846,4 +825,56 @@ string fileNameFromPath (string file)
     string temp = file.substr( file.find_last_of('/')+1, file.length() );
     return temp;
 }
+void grade_specific_assignment( string directory)//grades a specific directory
+{
+    
+    vector <string> critTestCases;
+    vector <string> testCases;
+    vector <string> studentDirs;
+    ofstream LOG;
+    time_t rawTime;
+    tm * timeInfo;
+    char buffer [40];
 
+    // Clear vectors containing test cases and directories
+    critTestCases.clear();
+    testCases.clear();
+    studentDirs.clear();
+
+    // Create time stamp string for files
+    time (&rawTime);
+    timeInfo = localtime (&rawTime);
+    strftime (buffer,40,"%d_%m_%y_%H_%M_%S",timeInfo);
+    string exeTime = buffer;
+    LOG.open(string("GRADES_"+exeTime+".log").c_str());
+
+    // Find all critical test cases
+    directoryCrawl( FILES,directory, "_crit.tst", true, critTestCases, 1 );
+
+    // Find all regular test cases
+    directoryCrawl( FILES, directory, ".tst", true, testCases, 0 );
+
+    // Find all student directories
+    directoryCrawl( DIRECTORIES,directory, "", true, studentDirs, 0  );
+
+    // Grade programs against test cases
+    grade( critTestCases, testCases, studentDirs, LOG, exeTime );
+
+    // Close the Grading Summary log file
+    LOG.close();
+}
+void grade_all_assignments();
+{
+    //grab all sub directories
+  
+    //loop through directories passing them to grade_specific_assignment
+}
+
+
+void create_all_test_cases()
+{
+    //grab all sub directories
+    
+ 
+    //loop through directories passsing them to specific test case generation function
+}
