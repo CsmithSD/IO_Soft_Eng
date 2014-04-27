@@ -9,27 +9,30 @@ in the program design and implementation.  This section will also contain the st
 initial user stories, and requirements. 
 
 \subsection{Purpose of the System}
-The purpose of this system is to provide the user with a grading program.  This program will find and run each program to be tested against existing test cases, and provide a grading summary of the results, as well as a personal log for each tested program.  This grading program will be capable of accounting for critical test cases and provide a system for creating test cases according to desired criteria. The program is specifically geared toward computer science professors for their use in 
-grading student programs.
+The purpose of this system is to provide the user with a grading program.  This program will find and run each program to be tested against existing test cases, and provide a grading summary of the results, as well as a personal log for each tested program.  This grading program will be capable of accounting for critical test cases and provide a system for creating test cases according to desired criteria. The program is specifically geared toward computer science professors for their use in grading student programs.
+
+In Sprint 2 additional features were integrated into the test suite. It was made to traverse a directory and grade numerous programs. It was given the ability to create integer and float test cases.
+
+In Sprint 3 we have added many features and improved on some. The test case generator now produces string test cases as well as integers and floats. It also short circuits if a program runs too long (too long is determined my the user but there is a one minute default). It also has the capability to test menu driven programs and make allowance for some minor presentation errors. Finally, it now has the ability to inform the user how much of the code has been tested and the performance of that code.
 
 
 \section{ Stakeholder Information}
 
 \subsection{Customer or End User (Product Owner)}
-Lisa Woody is the Product Owner of this project.  She will clarify and define the End Users' needs and requirements 
+Charles Parsons is the Product Owner of this project. He will clarify and define the End Users' needs and requirements 
 for this product, as well as establish and prioritize the product backlog.
 
 \subsection{Management or Instructor (Scrum Master)}
-Joe Lillo is the Scrum Master for the project.  He is responsible for scheduling the project meetings, as well as 
+Jarod Hogan is the Scrum Master for the project.  He is responsible for scheduling the project meetings, as well as 
 determining and assigning the tasks necessary to deliver the required product.
 
 \subsection{Developers --Testers}
-Dan Nix is the Technical Lead and for the project.  He will be responsible for the high level design and final
+Chris Smith is the Technical Lead and for the project.  He will be responsible for the high level design and final
 testing of the program.
 
 \section{Business Need}
 This software must simplify and automate the grading process, by aiming at reducing the amount of time a professor must personally spend on grading each student's program.  The product will meet that need and enable 
-the end user to not only maintain a detailed, dated record of each test and the grading summary, but also create customized new test cases according to thier requirements.and its detailed output.
+the end user to not only maintain a detailed, dated record of each test and the grading summary, but also create customized new test cases according to their requirements and its detailed output. It will also enable the user to determine the efficiency of the tests run on the program.
 
 \section{Requirements and Design Constraints}
 
@@ -79,16 +82,16 @@ as in the first iteration, only a single program must be compiled and tested.
          track of the backlogs and sprint status.
 \item All parties have access to the Sprint and Product Backlogs, via Trello.
 \item This particular project will be encompassed by only one Sprint.
-\item The Sprint Cycle of this project is two weeks.
+\item The Sprint Cycle of this project is one month.
 \item The source control will be carried out using GitHub
 \end{itemize}
 
 \section{User Stories}
 
-\subsection{User Story \#1}
+\subsection{User Story Sprint 1 \#1}
 As a user of the program, I would like to be able to specify a program to grade that will test the program and create a record of easy to understand output.
 
-\subsubsection{User Story \#1 Breakdown}
+\subsubsection{User Story Sprint 1 \#1 Breakdown}
 This application will be targeted towards instructors needing to test submitted student programs against applicable test
 cases.  The application will be run from the command line, using the name of the program to be tested as an inital parameter.
 For each existing test case, the program will be run using that test case's .tst file as input.  The output will be recorded and 
@@ -96,15 +99,88 @@ compared to the accompanying answer file for that test case.  A summary of the r
 output in the log file created each time the application is run.
 
 
-\subsection{User Story \#2} 
+\subsection{User Story Sprint 1 \#2} 
 As a user of the program, I would like to be able to be able to grade the programs of all students in the directory, so that I can have a detailed summary of the results.
-\subsubsection{User Story \#2 Breakdown}
+\subsubsection{User Story Sprint 1 \#2 Breakdown}
 A product that will find and grade a program for each student in the CSC 150 class, using acceptance testing and general test cases. A time-stamped summary will be placed in the CSC 150 folder, containing the grade of every student.  A grade of "FAILED" will be recorded in this summary if the student's program fails any of the acceptance test cases.  If the student passes the acceptance testing, the grade will be comprised of the rate of success that program has against the other test cases existing in the "Test" directory.
 
-\subsection{User Story \#3} 
+\subsection{User Story Sprint 1 \#3} 
 As a user of the program, I would like to be able to generate test cases, so that I can easily add test cases according to my specific requirements.
-\subsubsection{User Story \#3 Breakdown}
+\subsubsection{User Story Sprint 1 \#3 Breakdown}
 This product must give the option of generating test cases for testing a simple program that finds properties in a list.  The user must be able to declare the number of test cases needed, the range the numbers can cover, and the maximum number of numbers in the list.
+
+\subsection{User Story Sprint 2 \#1}
+Process the programs of an entire class just given the directory.
+ 
+\subsection{User Story Sprint 2 Breakdown\#1}
+The test suite will be placed in the root directory. This directory is to be traversed by the test suite to compile and test every .cpp file within the directory or any sub-directory. 
+
+\subsection{User Story Sprint 2 \#2}
+Use acceptance tests to pass or fail a program based on outcome.
+
+\subsection{User Story Sprint 2 Breakdown \#2}
+Certain tests shall be labeled as acceptance tests upon which a passing grade for the programs will depend. If they do not pass a failing grade will be assigned. If some are passed then the percentage of passed tests is assigned as a grade.
+
+\subsection{User Story Sprint 2 \#3}
+Make a log file for each specific student and cumulative file in the root directory.
+
+\subsection{User Story Sprint 2 Breakdown \#3}
+An individual log file will be stored in each students sub-directory and a summary file will be placed in the root directory. The summary file will be named CS150.log.
+
+\subsection{User Story Sprint 2 \#4}
+Run multiple tests all of which will be stored in a test sub-directory.
+
+\subsection{User Story Sprint 2 Breakdown \#4}
+All tests are guaranteed to be stored in a sub-directory called "tests".
+This sub-directory will be stored in the root directory. There may be sub-directories within the tests' directory.
+
+\subsection{User Story Sprint 2 \#5}
+Automatically generate test files for the test suite to run. Store these tests in the tests sub-directory.
+
+\subsection{User Story Sprint 2 Breakdown \#5}
+The test suite will, at the users request, write files of randomly generated integers or floats as specified by the user. The limit of files will also be specified by the user. The number of integers or floats will be a random number from 1 to 200.
+
+\subsection{User Story Sprint 2 \#6}
+Create prompts for the user to make choices concerning the random tests without having to use the execution statement.
+
+\subsection{User Story Sprint 2 Breakdown \#6}
+Instead of getting all information from the execution of the test suite, prompt the user for information such as  whether they wish to generate test cases and which kind they wish to generate.
+
+\subsection{User Story Sprint 3 \#1}
+Test cases using strings need to be added.
+
+\subsection{User Story Sprint 3 Breakdown \#1}
+The test suite will need to prompt the user if they would like to create lists of strings for use in testing much like lists of integers or floats can be created.
+
+\subsection{User Story Sprint 3 \#2}
+Performance testing ability would greatly improve the usefulness of the test suite.
+
+\subsection{User Story Sprint 3 Breakdown \#2}
+Using the gprof tool on linux the test suite extracts the performance information of the  code being tested.
+
+\subsection{User Story Sprint 3 \#3}
+Code coverage should be included in good test suites. This feature is already available in many applications to aid in unit testing.
+
+\subsection{User Story Sprint 3 Breakdown \#3}
+Using the gcov tool the test suite extracts the percent of code used while running the tests. This allows the user to perform unit testing with more ease and greater accuracy.
+
+\subsection{User Story Sprint 3 \#4}
+The test suite should be flexible. It needs to work around certain human errors and not include them in the test.
+
+\subsection{User Story Sprint 3 Breakdown \#4}
+The test suite will take into account certain presentation errors and not count it as wrong even if there is an incorrect number of spaces or slight spelling errors.
+
+\subsection{User Story Sprint 3 \#5}
+The test suite should be able to function with more than just input and output.
+
+\subsection{User Story Sprint 3 Breakdown \#5}
+Out suite now has the ability to interact with menu driven programs. It can select different options in order to provide greater code coverage.
+
+\subsection{User Story Sprint 3 \#6}
+The test suite should not allow a program to run indefinitely.
+
+\subsection{User Story Sprint 3 Breakdown \#6}
+The suite now has a default one minute time out to prevent a program with an infinite loop from running forever. This time limit can be changed by the user to allow for longer programs to run.
 
 
 \section{Research or Proof of Concept Results}
