@@ -717,6 +717,10 @@ bool compile_code( string filename )
     
     // Produce "g++ program.cpp -o program" command
     string compile_instruction = "g++ ";
+    //add in the flags for gcov
+    compile_instruction += "-fprofile-arcs -ftest-coverage ";
+    //add in the flag for gprof
+    compile_instruction += "-pg ";
     compile_instruction += filename;
     compile_instruction += " -o ";
     compile_instruction += executable; // name of golden cpp file
