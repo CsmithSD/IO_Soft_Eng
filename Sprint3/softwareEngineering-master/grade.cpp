@@ -75,6 +75,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <algorithm>
 
 using namespace std;
 
@@ -90,7 +91,7 @@ vector <string> runGprof();
 void readFile(vector <string> &list);
 double calc_percentage(int , int );
 void directoryCrawl( bool , string , string , bool, vector <string> & names, bool );
-bool test(const string &, string , string );
+bool test(const string &, string , string, bool& );
 int print_menu();
 bool create_test_cases();
 bool create_specific_test_cases( string );
@@ -108,6 +109,11 @@ void grade_specific_assignment( string );//grades a specific directory
 void grade_all_assignments();
 void create_all_test_cases();
 void run_gcov( string executable_name );
+bool presentation_check(string, string);
+bool rounding_error(string, string);
+bool same_word(string, string);
+bool number(string);
+
 /*! *******************************************************
  * \brief Main entry point of program.
  * \return 0 - Success / Else - Error
@@ -188,7 +194,7 @@ void grade( vector <string> critTestCases, vector <string> testCases,
     string line;
     int passCount;
     ofstream student_LOG;
-
+    bool presentation_error;
     // Iterate over student directories
     for ( stdnt_it = studentDirs.begin(); stdnt_it < studentDirs.end(); stdnt_it++)
     {
@@ -249,7 +255,7 @@ void grade( vector <string> critTestCases, vector <string> testCases,
             student_LOG << string( removeExtension(testFile) ) << ": ";
 
             // If the student's program fails the critical test...
-            if ( !test(executable,out_file,*test_it) )
+            if ( !test(executable,out_file,*test_it, presentation_error) )
             {
                 // Record the student's grade as "FAILED" in the main summary log
                 LOG << stdnt_it -> substr( stdnt_it -> find_last_of('/') + 1, stdnt_it -> length() )
@@ -266,8 +272,14 @@ void grade( vector <string> critTestCases, vector <string> testCases,
             }
             // If the student's program passes the critical test, record a "PASS" in the student log.
             else
-                student_LOG << "PASS" << endl;
+            {
+                student_LOG << "PASS"; 
+                if(presentation_error)
+                    student_LOG << " With presentation errors.";
 
+                student_LOG << endl;
+            }
+            presentation_error = false;
             run_gcov( executable );
             ifstream gcov_file( string( executable + ".cpp.log" ).c_str());
             //can skip first line
@@ -300,14 +312,19 @@ void grade( vector <string> critTestCases, vector <string> testCases,
 
             // If the student's program passes the critical test, record a "PASS" in the student log
             // and increment the pass count
-            if ( test(executable,out_file, *test_it) )
+            if ( test(executable,out_file, *test_it, presentation_error) )
             {
                 passCount++;
-                student_LOG << "PASS" << endl;
+                student_LOG << "PASS";
+                if(presentation_error)
+                    student_LOG << " With presentation errors.";
+
+                student_LOG << endl;
             }
             // If the student's program fails the test, record a "FAIL" in the student log
             else
                 student_LOG << "FAIL" << endl;
+            presentation_error = false;
         }
 
         // If all the critical test cases were passed, record success rate of the other test cases
@@ -478,9 +495,10 @@ void directoryCrawl( bool type, string dir, string file, bool recursive, vector 
  * \param program - current program string to run
  * \param a_file - Output file.
  * \param tst_file - Test file
+ * \param presentation_error - flag to mark if there was a presentation error
  * \return Program Passed or Failed.
  ********************************************************** */
-bool test(const string &program, string a_file, string tst_file)
+bool test(const string &program, string a_file, string tst_file, bool &presentation_error)
 {
     char* args[50];
     int childpid;
@@ -540,7 +558,11 @@ bool test(const string &program, string a_file, string tst_file)
     {
         return true;
     }
-
+    if(presentation_check(a_file, string( tst_file.substr(0,tst_file.find_last_of('.') ) + ".ans" )))
+    {
+        presentation_error = true;
+        return true;
+    }
     return false;
 }
 
@@ -1049,4 +1071,100 @@ void create_all_test_cases()
 void run_gcov( string executable_name )
 {
     system( string("gcov " + executable_name + " > " + executable_name + ".log").c_str() );
+}
+
+
+
+bool presentation_check(string ans_file, string student_file)
+{
+    string expected_output;
+    string student_output;
+
+    ifstream exp_fin;
+    ifstream stu_fin;
+
+    exp_fin.open(ans_file.c_str());
+    stu_fin.open(student_file.c_str());
+
+    while( exp_fin >> expected_output)
+    {
+       if( stu_fin >> student_file )
+       {
+            if(student_output != expected_output)
+            {
+                if( !number(expected_output) )
+                {
+                    if( student_output.size() != expected_output.size() )
+                        return false;
+
+                    if( !same_word( expected_output, student_output ) )
+                        return false;
+                }
+                else
+                {
+                    if( !rounding_error(expected_output, student_output) )
+                        return false;
+                }
+
+            }
+       }
+       else
+           return false;
+    }
+
+    if(stu_fin >> student_file)
+        return false;
+    return true;
+}
+
+bool number(string expected )
+{
+    if(expected.find(".") != string::npos)
+        return true;
+    
+    return false;
+}
+
+bool same_word( string expected, string student )
+{
+    transform(expected.begin(), expected.end(), expected.begin(),::tolower);
+    transform(student.begin(), student.end(), student.begin(), ::tolower);
+    
+    if( expected[0] == student[0] && expected[ expected.size()-1 ] == student[ student.size()-1 ])
+        return true;
+
+    sort( expected.begin(), expected.end() );
+    sort( student.begin(), student.end() );
+    
+    if( student == expected )
+        return true;
+    
+    return false;
+}
+
+bool rounding_error( string expected, string student )
+{
+    int exp_length = expected.size();
+    int stu_length = student.size();
+
+    if(stu_length < exp_length )
+        return false;
+    int i;
+    for (i = 0; i < exp_length; i++)
+    {
+        if(student[i] != expected[i] && i != exp_length)
+            return false;
+    }
+    if(i < stu_length)
+    {
+        while(stu_length > exp_length)
+        {
+            if(student[stu_length - 1 ] >= '5')
+                student[stu_length - 2 ]++;
+            stu_length--;
+        }
+        if( student[i] != expected[i] )
+            return false;
+    }
+    return true;
 }
