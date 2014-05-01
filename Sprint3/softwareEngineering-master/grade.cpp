@@ -165,13 +165,15 @@ int main( )
             cout << "Enter the limit for the max runtime (in seconds): ";
             cin >> _TIME_LIMIT;
         }
-        else
+        else if ( menuFLAG == 6)
+            exit(0);
+        else    
             cout << "Invalid menu choice." << endl << endl;
 
 
         cout << endl << endl;
     }
-
+return 1;
 }
 
 /*! ********************************************************
@@ -580,8 +582,6 @@ int print_menu()
     int choice = 0;
 	
     // While the user hasn't entered a valid choice, get a new choice
-    while( choice < 1 || choice > 5 )
-    {
 
         cout << "Main Menu:" << endl;
         cout << "1. Test all program assignments" << endl;
@@ -594,7 +594,6 @@ int print_menu()
         cout << "Choice: ";
         cin >> choice;
         cout << endl;
-    }
 
     return choice;
 }
@@ -612,9 +611,13 @@ int print_menu()
  *                  for file entries, int or float test entries, and output
  *                  test/answer file name
  ********************************************************** */
-bool create_test_cases()
+bool create_test_cases(string dir)
 {
+    
+}
 
+bool create_specific_test_cases( string assignment )
+{
     string fn = "gen_case";
     int num_cases = 0;  // Number of test files to create
     int max_entries = 0;    // Number of entries in a test file
@@ -689,7 +692,7 @@ bool create_test_cases()
     int found;
     vector<string> golden_name;
     // Crawl through the root directory to find the golden cpp
-    directoryCrawl( true, ".", ".cpp", false, golden_name, 0 );
+    directoryCrawl( true, assignment, ".cpp", false, golden_name, 0 );
     
     // Since our grade.cpp file could possibly be in the base directory
     // strip it out, just in case...
@@ -725,7 +728,7 @@ bool create_test_cases()
         nopen = false;
 
         //Piece together the path to store the tst and ans files
-        filename = "test_";
+        filename = assignment + "test_";
         fout << fixed;
         if( data_type == 'i' ){
             fout << setprecision(0);
@@ -784,12 +787,6 @@ bool create_test_cases()
     }
 
     return true;
-}
-
-bool create_specific_test_cases( string assignment )
-{
-    //checks if menu assignment and goes through menu case generation or other generation
-    return false;
 }
 
 
@@ -1051,7 +1048,25 @@ void grade_specific_assignment( string directory)//grades a specific directory
 void grade_all_assignments()
 {
     //grab all sub directories
-  
+    //grab all sub directories
+     struct dirent **namelist;   //structure that contains files and directories that scandir is called
+
+    int n;                      //total of number files and directories in given directory
+    int i;                      //loop counter
+
+    string temp;                //tmp variable to conver c string to c++ string in loop
+    bool found = false;         //variable to be returned regardless of file found or not since its initially set to false
+    
+    // Scan dir for files and directories
+    n = scandir( program_directory.c_str(), &namelist, 0, alphasort );
+
+    // Error check
+    if(n == -1)
+        return found;
+
+    for( i = 2; i < n; i++)
+        grade_specific_assignment(string( namelist[i] -> d_name));
+
     //loop through directories passing them to grade_specific_assignment
 }
 
@@ -1059,9 +1074,23 @@ void grade_all_assignments()
 void create_all_test_cases()
 {
     //grab all sub directories
+     struct dirent **namelist;   //structure that contains files and directories that scandir is called
+
+    int n;                      //total of number files and directories in given directory
+    int i;                      //loop counter
+
+    string temp;                //tmp variable to conver c string to c++ string in loop
+    bool found = false;         //variable to be returned regardless of file found or not since its initially set to false
     
- 
-    //loop through directories passsing them to specific test case generation function
+    // Scan dir for files and directories
+    n = scandir( program_directory.c_str(), &namelist, 0, alphasort );
+
+    // Error check
+    if(n == -1)
+        return found;
+
+    for( i = 2; i < n; i++)
+        create_specific_test_cases(string( namelist[i] -> d_name));
 }
 
 
