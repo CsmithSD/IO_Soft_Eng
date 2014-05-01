@@ -31,6 +31,26 @@ Grading system that includes critical test cases
 \subsection{Major System Component \#6}
 Automatic test case generation.
 
+\section{Sprint 3}
+
+\subsection{Major System Component \#7}
+Generate lists of strings
+
+\subsection{Major System Component \#8}
+Check for infinite loops.
+
+\subsection{Major System Component \#9}
+More robust checking of answers.
+
+\subsection{Major System Component \#10}
+Menu-driven testing.
+
+\subsection{Major System Component \#11}
+Add test coverage to the report.
+
+\subsection{Major System Component \#12}
+Add performance information to the report
+
 \section{Systems Goals}The purpose of this project is to create a program that will traverse a directory and test the necessary programs against test cases, outputting the results of the testing into a summary file.  Furthermore, the user will be able to create additional test cases according to desired requirements. The program is specifically geared toward computer science professors for the use use of grading student programs. 
 
 \section{System Overview and Diagram}
@@ -75,6 +95,16 @@ See Figure~\ref{systemdiagram2} for the system overview diagram of Sprint 2.
 \end{center}
 \caption{The Sprint 2 Testing System Diagram \label{systemdiagram2}}
 \end{figure}
+
+\subsection{Sprint 3}
+Many features have been added in Sprint 3. 
+\begin{description}
+\item[First      ]The test generator of our test suite now generates string test cases.
+\item[Second]Infinite loops are now prevented in the program by setting a default time limit of 60 seconds. After this time the program is terminated. This time frame can be altered by the user to be shorter or longer as needed.
+\item[Third   ]Answer checking has completely evolved. Now it allows for small errors to pass with a simple notice of the errors' existence. If there are slight misspellings or incorrect spacing these will be tolerated.
+\item[Fourth      ]Menu driven testing has been added as well. Instead of simply running based on single level user input the test suite is now able to handle different acceptable inputs and follow the functions logic to run the appropriate tests.
+\item[Fifth   ]Test coverage as now also been implemented. This test suite now makes use of gcov to inform the user how much code is being covered by the tests run. This will enable the users to test their code more thoroughly.
+\item[Six   ]Gprof is also utilized by our test suite to give the user the time spent in each function of the program being tested by the suite. This information is, as the gcov information, written to the log file of the program. 
 
 \section{Technologies Overview}
 The development team used the Agile Software Development Method, via the Scrum framework, to develop
