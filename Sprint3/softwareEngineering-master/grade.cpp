@@ -80,6 +80,8 @@ const bool DIRECTORIES = false;
 
 //function prototypes
 void grade( vector <string> ,vector <string> , vector <string>, ofstream &, string );
+vector <string> runGprof();
+void readFile(vector <string> &list);
 double calc_percentage(int , int );
 void directoryCrawl( bool , string , string , bool, vector <string> & names, bool );
 bool test(const string &, string , string );
@@ -301,11 +303,64 @@ void grade( vector <string> critTestCases, vector <string> testCases,
                         << calc_percentage( passCount, testCases.size() ) << "%" << endl;
         }
 
+        vector <string> list;
+        //gprof function
+        list = runGprof();
+        student_LOG << "Gprof information:" << endl;
+        for(unsigned int i=0; i < list.capacity(); i++)
+          student_LOG << list[i] << endl;
+
         // Close the student log file
         student_LOG.close();
     }
 }
 
+vector <string> runGprof()
+{
+  system("gprof loop gmon.out > analysis.txt");
+
+  vector <string> list;
+  readFile(list);//returns list of the functions names followed by time percentages
+  system("rm analysis.txt gmon.out");
+  return list;
+}
+
+void readFile(vector <string> &list)
+{
+  ifstream fin;
+  string line, word;
+  int i = 0;
+  unsigned int count = 0;
+
+  fin.open("analysis.txt");
+  if(!fin)
+  {
+    cout << "Could not open file analysis.txt" << endl;
+    return;
+  }
+
+  while(fin >> word)
+  {
+    getline(fin, line);
+    line = word + line;
+    i++;
+
+    if(i >= 6)
+    {
+     
+      if(word[0] != '0')
+        return;
+         
+        if(list.capacity() <= count)
+        {
+          list.resize(2 * count + 1);
+        }
+
+        list[count] = line;
+        count++;
+    }
+   }
+}
 
 /*! *******************************************************
  * \brief Returns a floating point percentage (passed/total)
