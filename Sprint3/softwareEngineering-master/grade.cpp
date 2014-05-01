@@ -80,6 +80,8 @@ using namespace std;
 
 const bool FILES = true;
 const bool DIRECTORIES = false;
+int _TIME_LIMIT;//global variable that will hold the time limit entered by the
+               //user.
 
 
 //function prototypes
@@ -123,7 +125,7 @@ int main( )
     int menuFLAG = 0;
 
     // Create menu until user chooses to exit
-    while ( menuFLAG != 5 )
+    while ( menuFLAG != 6 )
     {
         // Get user input from the menu
         menuFLAG = print_menu();
@@ -152,6 +154,11 @@ int main( )
 
             create_specific_test_cases( specific_dir + "/" );
         }
+        else if ( menuFLAG == 5 )
+        {
+            cout << "Enter the limit for the max runtime (in seconds): ";
+            cin >> _TIME_LIMIT;
+        }
         else
             cout << "Invalid menu choice." << endl << endl;
 
@@ -178,6 +185,7 @@ void grade( vector <string> critTestCases, vector <string> testCases,
     vector<string>::iterator test_it;
     vector<string> cppFiles;
     bool FLAG;
+    string line;
     int passCount;
     ofstream student_LOG;
 
@@ -259,6 +267,16 @@ void grade( vector <string> critTestCases, vector <string> testCases,
             // If the student's program passes the critical test, record a "PASS" in the student log.
             else
                 student_LOG << "PASS" << endl;
+
+            run_gcov( executable );
+            ifstream gcov_file( string( executable + ".cpp.log" ).c_str());
+            //can skip first line
+            getline( gcov_file, line );
+            //need to keep second line
+            getline( gcov_file, line );
+            //write the code coverage of this test to the student log file
+            student_LOG << line << endl;
+            gcov_file.close(); 
         }
 
         // Create a variable to store the number of passed regular test cases
@@ -456,7 +474,7 @@ void directoryCrawl( bool type, string dir, string file, bool recursive, vector 
  * \brief This function will run a tst file with the compiled cpp
                 file and compare the outputs of redirected output to a
                 .out file with a .ans file by running a diff command
- * \author Chris Smith
+ * \author Chris Smith - modiefied by Charles Parsons
  * \param program - current program string to run
  * \param a_file - Output file.
  * \param tst_file - Test file
@@ -464,18 +482,25 @@ void directoryCrawl( bool type, string dir, string file, bool recursive, vector 
  ********************************************************** */
 bool test(const string &program, string a_file, string tst_file)
 {
-    char* args[2];
+    char* args[50];
     int childpid;
-    string command;
+    char command[49];
+    int num_args = 0;
     int status;
-    int time_limit = 60; //set time limit to 60 seconds
     int timer;
     int wait_pid;
 
-    //put together command for execvp call
-    command = program + " < " + tst_file + " > " + a_file;
-    args[0] = command.c_str();
-    args[1] = NULL;
+    //put string that makes up the command into command char array
+    strcpy( command, string( program + " < " + tst_file + " > " + 
+            a_file ).c_str() );
+
+    //tokenize the command string and place into the args array for use by exec
+    args[num_args] = strtok( command, " " );
+    while( args[num_args] != NULL )
+    {
+        ++num_args;
+        args[num_args] = strtok( NULL, " " );
+    }
 
     childpid = fork();
 
@@ -501,7 +526,7 @@ bool test(const string &program, string a_file, string tst_file)
 
         //check if the time limit has been exceeded, if it has then kill the
         //child process and return false
-        if( timer >= time_limit )
+        if( timer >= _TIME_LIMIT )
         {
             kill( childpid, 9 );
             return false;
@@ -541,7 +566,8 @@ int print_menu()
         cout << "2. Test specific assignment" << endl;
         cout << "3. Create test files for all assignments" << endl;
         cout << "4. Create test files for specific assignment" << endl;
-        cout << "5. EXIT" << endl;
+        cout << "5. Set max runtime limit" << endl;
+        cout << "6. EXIT" << endl;
 
         cout << "Choice: ";
         cin >> choice;
