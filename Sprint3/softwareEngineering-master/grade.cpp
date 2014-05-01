@@ -87,6 +87,7 @@ int print_menu();
 bool create_test_cases();
 bool create_specific_test_cases( string );
 double generate_random( double min, double max, char type );
+string stringGenerator( double min, double max);
 string iToA( int i );
 bool create_ans_file( string , string );
 bool compile_code( string  );
@@ -495,8 +496,8 @@ bool create_test_cases()
         
     }
 
-    while( data_type != 'i' && data_type != 'f' ){
-        cout << "(I)ntegers or (F)loats? ";
+    while( data_type != 'i' && data_type != 'f' && data_type != 's'){
+        cout << "(I)ntegers, (F)loats, (S)trings? ";
         cin >> data_type;
 
         data_type = tolower( data_type );
@@ -569,6 +570,7 @@ bool create_test_cases()
     int file_counter = 1;   //Number to append to output file name
     bool nopen = false;     //Bool to store if the file is opened
     double temp;             //Temporary var to use while generating random #s
+    string strTemp;
     float file_size;        //Holds the maximum number of entries in a file
 
     // For each test file that we need to create
@@ -613,10 +615,19 @@ bool create_test_cases()
             // Output random numbers to the test file
             for( int i=0; i < file_size; i++){
                 // Generate a single random number for the file
-                temp = generate_random( range_min, range_max, data_type );   
+                if(data_type == 'i' || data_type == 'f')
+                {
+                  temp = generate_random( range_min, range_max, data_type ); 
+                  // Write the number and a newline to file 
+                  fout << temp << "\n"; 
+                }
+                else
+                {
+                   strTemp = stringGenerator(range_min, range_max);
+                   // Write the word and a newline to file 
+                   fout << strTemp << "\n";
+                }  
                 
-                // Write the number and a newline to file 
-                fout << temp << "\n";
             }
 
             // Close the test file
@@ -665,7 +676,29 @@ double generate_random( double min, double max, char type ){
 
 }
 
+string stringGenerator( double min, double max)
+{
+  ofstream fout( "bucket.in" );
+  string word = "";
+  char rand_letter;
+  int rand_len = 0;
+  int j;
 
+  if( !fout )
+    return word;
+
+  srand( time( NULL ) );
+
+
+  rand_len = int( rand() % 30 + 1 );
+
+  for( j = 0; j < rand_len; ++j )
+  {
+    rand_letter = int( rand() % 26 ) + 'a';
+    word += rand_letter;
+  }
+  return word;
+}
 
 /*! *******************************************************
  * \brief Converts an integer value to a string to append
