@@ -72,6 +72,10 @@
 #include <stdio.h>      /* printf, scanf, puts, NULL */
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>       /* time */
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
 using namespace std;
 
 const bool FILES = true;
@@ -101,6 +105,7 @@ string fileNameFromPath (string );
 void grade_specific_assignment( string );//grades a specific directory
 void grade_all_assignments();
 void create_all_test_cases();
+void run_gcov( string executable_name );
 /*! *******************************************************
  * \brief Main entry point of program.
  * \return 0 - Success / Else - Error
@@ -459,12 +464,49 @@ void directoryCrawl( bool type, string dir, string file, bool recursive, vector 
  ********************************************************** */
 bool test(const string &program, string a_file, string tst_file)
 {
+    char* args[2];
+    int childpid;
+    string command;
+    int status;
+    int time_limit = 60; //set time limit to 60 seconds
+    int timer;
+    int wait_pid;
 
-    
-    //runs the .cpp program with redirected input and output
-    system(string(program + " < " + tst_file + " > " + a_file).c_str());
+    //put together command for execvp call
+    command = program + " < " + tst_file + " > " + a_file;
+    args[0] = command.c_str();
+    args[1] = NULL;
 
+    childpid = fork();
 
+    if( childpid == 0 )
+    {
+        execvp( args[0], args );
+        perror( "Exec command failed: " );
+        exit(1);
+    }
+
+    timer = 0;
+
+    while( true )
+    {
+        sleep( 1 ); //sleep for one second
+        ++timer; //increment timer
+
+        wait_pid = waitpid( childpid, &status, WNOHANG );
+
+        //if process is done, break out of loop
+        if( wait_pid != 0 )
+            break;
+
+        //check if the time limit has been exceeded, if it has then kill the
+        //child process and return false
+        if( timer >= time_limit )
+        {
+            kill( childpid, 9 );
+            return false;
+        }
+    }
 
 
     //runs a diff command on the .ans and .out files and returns true if 
@@ -918,6 +960,8 @@ string fileNameFromPath (string file)
     string temp = file.substr( file.find_last_of('/')+1, file.length() );
     return temp;
 }
+
+
 void grade_specific_assignment( string directory)//grades a specific directory
 {
     
@@ -970,4 +1014,13 @@ void create_all_test_cases()
     
  
     //loop through directories passsing them to specific test case generation function
+}
+
+
+//executes gcov command on an executable creating the executable.cpp.gcov file
+//need to decide if i really need to redirect the output of this to a file
+//and if it should have a timestamp or not
+void run_gcov( string executable_name )
+{
+    system( string("gcov " + executable_name + " > " + executable_name + ".log").c_str() );
 }
