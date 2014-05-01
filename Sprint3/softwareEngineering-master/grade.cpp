@@ -95,7 +95,7 @@ void create_menu_test_cases(string);//creates the test cases for a menu driven p
 bool run_code( string , string  );
 string removeExtension (string );
 string fileNameFromPath (string );
-void grade_specific_assignment( string )//grades a specific directory
+void grade_specific_assignment( string );//grades a specific directory
 void grade_all_assignments();
 void create_all_test_cases();
 /*! *******************************************************
@@ -108,9 +108,9 @@ int main( )
     vector <string> testCases;
     vector <string> studentDirs;
     ofstream LOG;
-    time_t rawTime;
-    tm * timeInfo;
-    char buffer [40];
+    //time_t rawTime;
+    //tm * timeInfo;
+    //char buffer [40];
     string specific_dir;
     int menuFLAG = 0;
 
@@ -125,7 +125,7 @@ int main( )
         {
             grade_all_assignments();
         }
-        else if ( menuFlag == 2 )
+        else if ( menuFLAG == 2 )
         {
             cout << "Enter name of the directory to be graded: ";
             cin >> specific_dir;
@@ -142,7 +142,7 @@ int main( )
             cout << "Enter name of the directory for test case generation: ";
             cin >> specific_dir;
 
-            create_specific_test_cases( specific_dir + "/" )
+            create_specific_test_cases( specific_dir + "/" );
         }
         else
             cout << "Invalid menu choice." << endl << endl;
@@ -440,7 +440,7 @@ int print_menu()
 
         cout << "Main Menu:" << endl;
         cout << "1. Test all program assignments" << endl;
-        cout << "2. Test specific assignment"
+        cout << "2. Test specific assignment" << endl;
         cout << "3. Create test files for all assignments" << endl;
         cout << "4. Create test files for specific assignment" << endl;
         cout << "5. EXIT" << endl;
@@ -633,6 +633,7 @@ bool create_test_cases()
 bool create_specific_test_cases( string assignment )
 {
     //checks if menu assignment and goes through menu case generation or other generation
+    return false;
 }
 
 
@@ -746,15 +747,15 @@ bool check_if_menu_prog( string program_directory )//Checks if program structure
 
     // Error check
     if(n == -1)
-        return;
+        return found;
 
     //exits the loop if a spec file is found or the whole array is searched
     for( i = 2; i < n && !found; i++)
     {
         //converts the c style string to a c++ string
-        tmp = string( namelist[i] );
+        temp = namelist[i]-> d_name;
         //checks to see if the given string is a .spec file
-        if( tmp.find( ".spec" ) != string::npos )
+        if( temp.find( ".spec" ) != string::npos )
             //if the file is a spec file then found is set to true
             found = true;
     }
@@ -867,7 +868,7 @@ void grade_specific_assignment( string directory)//grades a specific directory
     // Close the Grading Summary log file
     LOG.close();
 }
-void grade_all_assignments();
+void grade_all_assignments()
 {
     //grab all sub directories
   
