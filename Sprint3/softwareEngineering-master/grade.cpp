@@ -611,10 +611,6 @@ int print_menu()
  *                  for file entries, int or float test entries, and output
  *                  test/answer file name
  ********************************************************** */
-bool create_test_cases(string dir)
-{
-    
-}
 
 bool create_specific_test_cases( string assignment )
 {
@@ -1058,11 +1054,9 @@ void grade_all_assignments()
     bool found = false;         //variable to be returned regardless of file found or not since its initially set to false
     
     // Scan dir for files and directories
-    n = scandir( program_directory.c_str(), &namelist, 0, alphasort );
+    n = scandir( ".", &namelist, 0, alphasort );
 
     // Error check
-    if(n == -1)
-        return found;
 
     for( i = 2; i < n; i++)
         grade_specific_assignment(string( namelist[i] -> d_name));
@@ -1083,11 +1077,9 @@ void create_all_test_cases()
     bool found = false;         //variable to be returned regardless of file found or not since its initially set to false
     
     // Scan dir for files and directories
-    n = scandir( program_directory.c_str(), &namelist, 0, alphasort );
+    n = scandir( ".", &namelist, 0, alphasort );
 
     // Error check
-    if(n == -1)
-        return found;
 
     for( i = 2; i < n; i++)
         create_specific_test_cases(string( namelist[i] -> d_name));
